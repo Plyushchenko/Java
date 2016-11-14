@@ -12,3 +12,4 @@ public abstract class Function1<X, Y> { //Function1: X -> Y
         };
     }
 }
+

@@ -1,7 +1,6 @@
 package Functional;
 
 public abstract class Predicate<X> extends Function1<X, Boolean> { //Predicate: X -> Boolean
-    public abstract Boolean apply(X x);
 
     public Predicate<X> or(Predicate<? super X> p) {
         return new Predicate<X>() {
@@ -30,11 +29,11 @@ public abstract class Predicate<X> extends Function1<X, Boolean> { //Predicate: 
         };
     }
 
-    public static final Predicate ALWAYS_TRUE = new Predicate() {
+    public static final Predicate <Object> ALWAYS_TRUE = new Predicate() {
         @Override
         public Boolean apply(Object o) {
             return true;
         }
     };
-    public static final Predicate ALWAYS_FALSE = ALWAYS_TRUE.not();
+    public static final Predicate <Object> ALWAYS_FALSE = ALWAYS_TRUE.not();
 }
