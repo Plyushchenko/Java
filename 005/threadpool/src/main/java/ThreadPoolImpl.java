@@ -63,9 +63,9 @@ public class ThreadPoolImpl {
 
 
     public <T> LightFuture<T> submit(Supplier<T> supplier){
-        LightFuture<T> task = new MyTask<>(supplier);
+        MyTask<T> task = new MyTask<>(supplier);
         synchronized (tasks){
-            tasks.add((MyTask)task);
+            tasks.add(task);
             tasks.notify();
         }
         return task;

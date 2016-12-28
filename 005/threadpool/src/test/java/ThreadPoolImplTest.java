@@ -1,8 +1,6 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.junit.Test;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 
 import static java.lang.Thread.sleep;
