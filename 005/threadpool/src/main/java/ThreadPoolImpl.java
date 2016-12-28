@@ -4,7 +4,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ThreadPoolImpl {
-    private final ArrayList<MyThread> threads;
+    private final ArrayList<Thread> threads;
     private final ArrayDeque<MyTask> tasks;
     private boolean shutdowned;
 
@@ -13,9 +13,9 @@ public class ThreadPoolImpl {
         shutdowned = false;
         threads = new ArrayList<>();
         for (int i = 0; i < n; i++){
-            threads.add(new MyThread());
+            threads.add(new Thread(new MyRunnable()));
         }
-        threads.forEach(MyThread::start);
+        threads.forEach(Thread::start);
     }
 
     private boolean isShutdowned() {
@@ -26,22 +26,22 @@ public class ThreadPoolImpl {
         shutdowned = true;
     }
 
-    public void shutdown(){
+    public synchronized void shutdown(){
         if (isShutdowned()){
             return;
         }
         tasks.forEach(MyTask::setThrewException);
         tasks.clear();
-        threads.forEach(MyThread::interrupt);
+        threads.forEach(Thread::interrupt);
         setShutdowned();
     }
 
 
-    private class MyThread extends Thread{
+    private class MyRunnable implements Runnable{
         @Override
         public void run(){
-            while (!isInterrupted()){
-                MyTask task = null;
+            while (!Thread.currentThread().isInterrupted()){
+                MyTask task;
                 synchronized (tasks){
                     if (tasks.isEmpty()){
                         try{
@@ -62,10 +62,10 @@ public class ThreadPoolImpl {
     }
 
 
-    public <T> MyTask<T> submit(Supplier<T> supplier){
-        MyTask<T> task = new MyTask<>(supplier);
+    public <T> LightFuture<T> submit(Supplier<T> supplier){
+        LightFuture<T> task = new MyTask<>(supplier);
         synchronized (tasks){
-            tasks.add(task);
+            tasks.add((MyTask)task);
             tasks.notify();
         }
         return task;
@@ -74,9 +74,10 @@ public class ThreadPoolImpl {
     private class MyTask<T> implements LightFuture<T>{
         private boolean ready = false;
         private boolean threwException = false;
-        private Supplier<T> supplier;
+        private final Supplier<T> supplier;
         private T taskResult;
-        private ArrayList<MyTask> waitingTasks;
+        private final ArrayList<MyTask> waitingTasks;
+        private Exception thrownException;
         private MyTask(Supplier<T> supplier){
             this.supplier = supplier;
             waitingTasks = new ArrayList<>();
@@ -106,30 +107,33 @@ public class ThreadPoolImpl {
                     wait();
                 }
             }
-            if (isThrewException() || isShutdowned()){
-                throw new LightExecutionException();
+            if (isThrewException()){
+                throw new LightExecutionException(thrownException);
+            }
+            if (isShutdowned()){
+                throw new InterruptedException();
             }
             return taskResult;
         }
 
         @Override
-        public <Y> LightFuture<Y> thenApply(Function<T, Y> function) {
+        public <Y> LightFuture<Y> thenApply(Function<? super T, Y> function) {
             Supplier<Y> supplier = () -> {
                 try {
                     return function.apply(get());
                 } catch (LightExecutionException | InterruptedException e) {
-                    setThrewException();
+                    e.initCause(e.getCause());
                     return null;
                 }
             };
 
-            MyTask<Y> newTask;
+            LightFuture<Y> newTask;
             synchronized (this) {
                 if (isReady()) {
                     newTask = submit(supplier);
                 } else {
                     newTask = new MyTask<>(supplier);
-                    waitingTasks.add(newTask);
+                    waitingTasks.add((MyTask) newTask);
                 }
             }
             return newTask;
@@ -139,12 +143,15 @@ public class ThreadPoolImpl {
             try {
                 taskResult = supplier.get();
             } catch (Exception e) {
-                threwException = true;
+                setThrewException();
+                thrownException = e;
             }
             synchronized (this){
-                for (MyTask waitingTask : waitingTasks) {
-                    tasks.add(waitingTask);
-                    tasks.notify();
+                synchronized (tasks){
+                    for (MyTask waitingTask : waitingTasks) {
+                        tasks.add(waitingTask);
+                        tasks.notify();
+                    }
                 }
                 setReady();
                 notifyAll();

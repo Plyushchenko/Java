@@ -1,9 +1,13 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
+import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class ThreadPoolImplTest {
@@ -68,13 +72,12 @@ public class ThreadPoolImplTest {
         HashSet<Long> ids = new HashSet<>();
 
         for (int i = 0; i < 300; i++) {
-            ((LightFuture)pool.submit(() -> {
+            (pool.submit(() -> {
                     try {
-                        Thread.sleep(1);
+                        sleep(1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-  //              }
                 ids.add(Thread.currentThread().getId());
                 return Thread.currentThread().getId();
             })).get();
@@ -82,10 +85,37 @@ public class ThreadPoolImplTest {
         assertEquals(n, ids.size());
     }
 
-    @Test (expected = LightExecutionException.class)
+    @Test (expected = InterruptedException.class)
     public void testShutdown() throws LightExecutionException, InterruptedException {
         ThreadPoolImpl tpi = new ThreadPoolImpl(10);
         tpi.shutdown();
-        ((LightFuture)tpi.submit(() -> 123)).get();
+        (tpi.submit(() -> 123)).get();
+    }
+
+    @Test
+    public void testWaitingTaskDoesntBlock() throws LightExecutionException, InterruptedException{
+        final boolean[] flag = new boolean[1];
+        ThreadPoolImpl tpi = new ThreadPoolImpl(2);
+        final LightFuture<Boolean> veryLongTask = tpi.submit(() -> {
+            Boolean result = Boolean.TRUE;
+            for (int i = 0; i < 10_000_000; i++){
+                result = Math.random() > 0.5 ? Boolean.TRUE : Boolean.FALSE;
+            }
+                flag[0] = true;
+            System.out.println("Done");
+            return result;
+        });
+        final LightFuture<Boolean> waitingForVeryLongTask = veryLongTask.thenApply(Function.identity());
+        final LightFuture<Integer> thirdTask = tpi.submit(() -> 1);
+        assertTrue(thirdTask.get().equals(1) && !flag[0]);
+    }
+
+    @Test (expected = LightExecutionException.class)
+    public void testExceptionForThenApply() throws LightExecutionException, InterruptedException{
+        ThreadPoolImpl tpi = new ThreadPoolImpl(1);
+        final LightFuture<Integer> exceptionTask = tpi.submit(() -> {
+            throw new UnsupportedOperationException();
+        });
+        int result = exceptionTask.thenApply(x -> x + 1).get();
     }
 }

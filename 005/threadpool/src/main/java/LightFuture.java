@@ -3,9 +3,9 @@ import java.util.function.Supplier;
 
 public interface LightFuture<T> {
 
-    public boolean isReady();
+    boolean isReady();
 
-    public T get() throws LightExecutionException, InterruptedException;
+    T get() throws LightExecutionException, InterruptedException;
 
-    public <Y> LightFuture<Y> thenApply(Function<T, Y> function);
+    <Y> LightFuture<Y> thenApply(Function<? super T, Y> function);
 }
