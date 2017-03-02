@@ -10,7 +10,7 @@ class MultiThreadLazy<T> implements Lazy<T> {
 
     private static final Object notComputedYet = new Object();
     private Supplier<T> supplier;
-    private Object computationResult = notComputedYet;
+    private volatile Object computationResult = notComputedYet;
 
     MultiThreadLazy(Supplier<T> supplier){
         this.supplier = supplier;
