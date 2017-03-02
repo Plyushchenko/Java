@@ -1,14 +1,14 @@
 /**
- *Interface which provides lazy computations
+ *Interface providing lazy computations
  *
- * @param <T> is the type of result of computation
+ * @param <T> is the type computation result
  */
 public interface Lazy<T> {
 
     /**
-     * Method which returns the result of computation
+     * Method returning the computation result
      *
-     * @return the result of computation
+     * @return the computation result
      */
     T get();
 
