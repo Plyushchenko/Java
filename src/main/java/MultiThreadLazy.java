@@ -8,9 +8,9 @@ import java.util.function.Supplier;
 
 class MultiThreadLazy<T> implements Lazy<T> {
 
-    private static final Object notComputedYet = new Object();
+    private static final Object NOT_COMPUTED_YET = new Object();
     private Supplier<T> supplier;
-    private volatile Object computationResult = notComputedYet;
+    private volatile T computationResult = (T)NOT_COMPUTED_YET;
 
     MultiThreadLazy(Supplier<T> supplier){
         this.supplier = supplier;
@@ -21,24 +21,19 @@ class MultiThreadLazy<T> implements Lazy<T> {
      * if computation hasn't been run then
      * lock and get computation result from supplier
      * then supplier is assigned null (just to let GC collect it)
-     *
-     * @return the result of computation
+     *@return the result of computation
      */
-
     @Override
     public T get() {
-        if (computationResult != notComputedYet) {
-            return (T)computationResult;
-        }
-
-        synchronized (this) {
-            if (computationResult == notComputedYet) {
-                computationResult = supplier.get();
-                supplier = null;
+        if (computationResult == NOT_COMPUTED_YET) {
+            synchronized (this) {
+                if (computationResult == NOT_COMPUTED_YET) {
+                    computationResult = supplier.get();
+                    supplier = null;
+                }
             }
-
-            return (T)computationResult;
         }
+        return computationResult;
     }
 
 }
