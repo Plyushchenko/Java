@@ -25,15 +25,16 @@ class MultiThreadLazy<T> implements Lazy<T> {
      */
     @Override
     public T get() {
-        if (computationResult == NOT_COMPUTED_YET) {
-            synchronized (this) {
-                if (computationResult == NOT_COMPUTED_YET) {
-                    computationResult = supplier.get();
-                    supplier = null;
-                }
-            }
+        if (computationResult != NOT_COMPUTED_YET) {
+            return computationResult;
         }
-        return computationResult;
+        synchronized (this) {
+            if (computationResult == NOT_COMPUTED_YET) {
+                computationResult = supplier.get();
+                supplier = null;
+            }
+            return computationResult;
+        }
     }
 
 }
