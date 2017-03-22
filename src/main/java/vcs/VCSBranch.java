@@ -14,8 +14,14 @@ import static vcs.VCSHead.getHeadCommitHash;
 import static vcs.VCSHead.updateHead;
 import static vcs.VCSLog.updateLog;
 
+/**
+ * class with methods to work with branches
+ */
 class VCSBranch {
 
+    /**
+     * update .git/refs/branchName by writing commitHash
+     */
     static void updateRefToBranch(String branchName, String commitHash) throws BranchWriteException {
         Path branchLocation = Paths.get(REFS_LOCATION + File.separator + branchName);
         try {
@@ -25,6 +31,11 @@ class VCSBranch {
         }
     }
 
+    /**
+     * create new branch;
+     * create new .git/log/branchName file with information about branch creation;
+     * write commitHash into .git/refs/branchName
+     */
     static void createBranch(String branchName, String commitHash)
             throws NoGitFoundException, BranchAlreadyCreatedException, LogWriteException, BranchWriteException {
         if (Files.notExists(GIT_LOCATION))
@@ -46,11 +57,19 @@ class VCSBranch {
         }
     }
 
+    /**
+     * check whether branch exists
+     */
     static boolean branchExists(String branchName) {
         Path branchLocation = Paths.get(REFS_LOCATION + File.separator + branchName);
         return Files.exists(branchLocation);
     }
 
+    /**
+     * switch to branchName
+     * update .git/HEAD with by writing branchName
+     * restore all the files from last commit on branchName
+     */
     static void switchToBranch(String branchName) throws NoGitFoundException, NoBranchFoundException, HeadWriteException,
             BranchReadException, HeadReadException, ContentReadException, ContentWriteException, TreeReadException, DirectioryCreateException {
         if (Files.notExists(GIT_LOCATION))
@@ -64,6 +83,9 @@ class VCSBranch {
         }
     }
 
+    /**
+     * create (if not exists) branch commitName and switch to this branch
+     */
     static void switchToCommit(String commitHash) throws HeadWriteException, NoGitFoundException, NoBranchFoundException,
             TreeReadException, HeadReadException, ContentWriteException, ContentReadException, BranchReadException, DirectioryCreateException,
             LogWriteException, BranchWriteException, BranchAlreadyCreatedException {
@@ -73,6 +95,9 @@ class VCSBranch {
         switchToBranch(commitHash);
     }
 
+    /**
+     * getting current branch name by reading from .git/HEAD
+     */
     static String getCurrentBranchName() throws NoGitFoundException, HeadReadException {
         if (Files.notExists(GIT_LOCATION))
             throw new NoGitFoundException();

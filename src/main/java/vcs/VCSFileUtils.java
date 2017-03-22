@@ -12,7 +12,7 @@ import java.util.List;
 class VCSFileUtils {
 
     static final Path CURRENT_DIRECTORY = Paths.get(System.getProperty("user.dir"));
-    static final Path GIT_LOCATION = Paths.get(CURRENT_DIRECTORY + File.separator + ".mygit");
+    static final Path GIT_LOCATION = Paths.get("./mygit");
     static final Path INDEX_LOCATION = Paths.get(GIT_LOCATION + File.separator + "index");
     static final Path REFS_LOCATION = Paths.get(GIT_LOCATION + File.separator + "refs");
     static final Path HEAD_LOCATION = Paths.get(GIT_LOCATION + File.separator + "HEAD");
@@ -45,11 +45,10 @@ class VCSFileUtils {
         List<String> filePathsAndHashes;
         try {
             filePathsAndHashes = Files.readAllLines(
-                    Paths.get(OBJECTS_LOCATION + File.separator + Files.lines(treeLocation).findFirst().get()));
+                    Paths.get(OBJECTS_LOCATION + File.separator + new String(Files.readAllBytes(treeLocation))));
         } catch (IOException e) {
             throw new TreeReadException();
         }
-        filePathsAndHashes.forEach(System.out::println);
         for (int i = 0; i < filePathsAndHashes.size(); i += 2) {
             Path fileLocation = Paths.get(filePathsAndHashes.get(i));
             String fileHash = filePathsAndHashes.get(i + 1);
@@ -72,7 +71,7 @@ class VCSFileUtils {
         }
     }
 
-    static void createGitDirectories() throws IOException {
+    static void createGitDirectoriesAndFiles() throws IOException {
         Files.createDirectory(GIT_LOCATION);
         Files.createFile(INDEX_LOCATION);
         Files.createDirectory(OBJECTS_LOCATION);

@@ -28,14 +28,17 @@ public class VCS {
         return isInit;
     }
 
+    /**
+     * init repo; create .git folder and other subfolders and files;
+     * commit "initial commit"
+     */
     public static void init() throws GitAlreadyInitedException, GitInitException {
         isInit = true;
         if (Files.exists(GIT_LOCATION)) {
-            System.out.println(GIT_LOCATION);
             throw new GitAlreadyInitedException();
         }
         try {
-            createGitDirectories();
+            createGitDirectoriesAndFiles();
             String initialCommitHash = commit("initial commit");
             VCSBranch.createBranch(MASTER_BRANCH, initialCommitHash);
             switchToBranch(MASTER_BRANCH);
@@ -46,6 +49,9 @@ public class VCS {
         isInit = false;
     }
 
+    /**
+     * checkout by commit (if arg is SHA1 hash) or branch
+     */
     public static void checkout(String arg) throws ContentWriteException, HeadWriteException, TreeReadException, NoBranchFoundException,
             BranchWriteException, HeadReadException, BranchReadException, DirectioryCreateException, LogWriteException,
             NoGitFoundException, ContentReadException, BranchAlreadyCreatedException {
@@ -56,11 +62,17 @@ public class VCS {
         }
     }
 
+    /**
+     * create new branch
+     */
     public static void createBranch(String branchName) throws HeadReadException, NoGitFoundException, BranchReadException,
             LogWriteException, BranchWriteException, BranchAlreadyCreatedException {
         VCSBranch.createBranch(branchName, getHeadCommitHash());
     }
 
+    /**
+     * building log by reading .git/logs/getCurrentBranchName() and returning it as byte array
+     */
     public static byte[] getCurrentBranchLog() throws NoGitFoundException, HeadReadException, LogReadException {
         if (Files.notExists(GIT_LOCATION))
             throw new NoGitFoundException();
@@ -72,6 +84,13 @@ public class VCS {
         }
     }
 
+    /**
+     * building list of branch names like this:
+     *   branch1
+     *   branch2
+     * * currentBranch
+     *   branch3
+     */
     public static List<String> buildBranchNamesList() throws NoGitFoundException, BranchReadException, HeadReadException {
         if (Files.notExists(GIT_LOCATION)) {
             throw new NoGitFoundException();
@@ -92,6 +111,7 @@ public class VCS {
         }
         return branchNames;
     }
+
 
     public static void add(List<Path> filesToAdd) throws NoGitFoundException, NoIndexFoundException, AddException,
             IndexReadException, FileToAddNotExistsException, NothingChangedSinceLastAddException {
@@ -114,6 +134,10 @@ public class VCS {
         }
     }
 
+    /**
+     * commit all the files from .git/index
+     * don't check whether state of file in user folder is same as the state in .git/index
+     */
     public static String commit(String message) throws NoGitFoundException, ContentReadException, ContentWriteException,
             IndexReadException, HeadReadException, BranchWriteException, LogWriteException, BranchReadException,
             NothingChangedSinceLastCommitException {
@@ -148,6 +172,9 @@ public class VCS {
         return commit.getHash();
     }
 
+    /**
+     * remove branch by name
+     */
     public static void removeBranch(String branchName) throws NoGitFoundException, NoBranchFoundException, MasterBranchDeleteException {
         if (Files.notExists(GIT_LOCATION)){
             throw new NoGitFoundException();
@@ -166,6 +193,14 @@ public class VCS {
         }
 
     }
+
+    /**
+     * merge branchToMergeName into current branch;
+     * if some file has different states in these 2 branches
+     * then state from branchToMergeName overrides state from currentBranch;
+     * also all these files will be added to .git/index and
+     * then git add then git commit with message about merge (for all files in .git/index)
+     */
     public static void merge(String branchToMergeName) throws NoGitFoundException, HeadReadException, ContentWriteException,
             AddException, NoIndexFoundException, FileToAddNotExistsException, NothingChangedSinceLastAddException,
             IndexReadException, BranchWriteException, LogWriteException, BranchReadException, ContentReadException,
@@ -178,8 +213,8 @@ public class VCS {
 
         List<String> filePathsAndHashesToMerge = null;
         try {
-            String commitHashToMergeLocation = Files.lines(
-                    Paths.get(OBJECTS_LOCATION + File.separator + Files.lines(branchToMergeRefLocation).findFirst().get())).findFirst().get();
+            String commitHashToMergeLocation = new String(Files.readAllBytes(
+                    Paths.get(OBJECTS_LOCATION + File.separator + new String(Files.readAllBytes(branchToMergeRefLocation)))));
             filePathsAndHashesToMerge = Files.readAllLines(
                     Paths.get(OBJECTS_LOCATION + File.separator + commitHashToMergeLocation));
         } catch (IOException e) {
@@ -205,6 +240,6 @@ public class VCS {
             //ignore
         }
         commit("merge " + branchToMergeName + " into " + currentBranchName);
-
     }
+
 }

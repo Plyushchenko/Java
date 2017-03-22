@@ -16,8 +16,15 @@ import static vcs.VCSFileUtils.GIT_LOCATION;
 import static vcs.VCSFileUtils.HEAD_LOCATION;
 import static vcs.VCSFileUtils.REFS_LOCATION;
 
+/**
+ * class with methods to work with .git/HEAD
+ */
 class VCSHead {
 
+    /**
+     * get last commit hash of current branch
+     * (read current branch name and read commit hash from .git/refs/getCurrentBranchName())
+     */
     static String getHeadCommitHash() throws NoGitFoundException, HeadReadException, BranchReadException {
         if (Files.notExists(GIT_LOCATION))
             throw new NoGitFoundException();
@@ -30,6 +37,10 @@ class VCSHead {
         }
     }
 
+    /**
+     * write branchName into .git/HEAD
+     * branchName is set as current branch
+     */
     static void updateHead(String branchName) throws HeadWriteException {
         try {
             Files.write(HEAD_LOCATION, branchName.getBytes());
