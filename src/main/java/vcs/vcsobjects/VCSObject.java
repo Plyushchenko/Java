@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * class for VCS objects. can create SHA1 hash from object content
+ */
 public abstract class VCSObject {
 
     private static final int HASH_LENGTH = 40;
@@ -41,6 +44,9 @@ public abstract class VCSObject {
         return content;
     }
 
+    /**
+     * add VCS object content to objects/getHash() file
+     */
     public void addObject(Path objectsLocation) throws ContentWriteException {
         Path objectLocation = Paths.get(objectsLocation + File.separator + getHash());
         try {
@@ -50,6 +56,9 @@ public abstract class VCSObject {
         }
     }
 
+    /**
+     * build SHA1 hash from VCS object content as byte array
+     */
     static String buildHash(byte[] content){
         MessageDigest digest = null;
         try {
@@ -64,15 +73,16 @@ public abstract class VCSObject {
 
     }
 
+    /**
+     * checks whether s matches SHA1 hash format
+     */
     public static boolean isHash(String s) {
-        System.out.println(s + " " + s.length());
         if (s.length() != VCSObject.HASH_LENGTH){
             return false;
         }
         for (int i = 0; i < s.length(); i++){
             char c = s.charAt(i);
             if (!('0' <= c && c <= '9' || 'a' <= c && c <= 'f')){
-                System.out.println(i + " " + c);
                 return false;
             }
         }

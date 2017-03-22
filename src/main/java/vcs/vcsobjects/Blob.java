@@ -12,6 +12,9 @@ public class Blob extends VCSObject{
         super(buildHash(content), "blob", content.length, content);
     }
 
+    /**
+     * build blob from file
+     */
     public static Blob buildBlob(Path fileToCommit) throws ContentReadException {
         try {
             return new Blob(Files.readAllBytes(fileToCommit));

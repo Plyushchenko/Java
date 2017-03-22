@@ -25,6 +25,9 @@ public class Commit extends VCSObject{
         return COMMIT_DATE;
     }
 
+    /**
+     * build line for .git/log/branchName with all information about commit
+     */
     public String getAllInformation() {
         return getHash() + " " + getCommitMessage() + " " + getCommitAuthor() + " " + getCommitDate() + "\n";
     }

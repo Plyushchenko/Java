@@ -17,8 +17,14 @@ import java.util.List;
 import static vcs.VCSFileUtils.*;
 import static vcs.vcsobjects.Blob.buildBlob;
 
+/**
+ * class with methods to work with .git/index
+ */
 class VCSIndex {
 
+    /**
+     * write lines to .git/index
+     */
     static void updateIndex(List<String> indexContent) throws IndexWriteException {
         try {
             createEmptyFile(INDEX_LOCATION);
@@ -36,6 +42,9 @@ class VCSIndex {
         }
     }
 
+    /**
+     * insert names of new files and update hashes of files which are already in .git/index
+     */
     static List<String> buildIndexContentAfterAdd(List<Path> filesToAdd)
             throws IndexReadException, ContentReadException, NothingChangedSinceLastAddException {
         List<String> indexContent = getIndexContent();
@@ -45,8 +54,6 @@ class VCSIndex {
             indexedFiles.add(Paths.get(indexContent.get(i)));
             indexedHashes.add(indexContent.get(i + 1));
         }
-        indexedFiles.forEach(System.out::println);
-        indexedHashes.forEach(System.out::println);
 
         boolean somethingChangedSinceLastAdd = false;
         for (Path fileToAdd : filesToAdd) {
@@ -66,8 +73,6 @@ class VCSIndex {
                 }
             }
         }
-        indexedFiles.forEach(System.out::println);
-        indexedHashes.forEach(System.out::println);
         if (!somethingChangedSinceLastAdd) {
             throw new NothingChangedSinceLastAddException();
         }
