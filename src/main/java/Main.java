@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Main {
 
@@ -56,11 +57,18 @@ public class Main {
                 if (args.length == 1) {
                     VCS.buildBranchNamesList().forEach(System.out::println);
                 } else {
-                    if (args.length != 3){
-                        System.out.println("format: git branch 'branchName'");
-                        return;
+                    if (args[1].equals("-d")){
+                        if (args.length != 3){
+                            System.out.println("format: git branch -d 'branchName'");
+                            return;
+                        }
+                        VCS.removeBranch(args[2]);
+                    } else {
+                        if (args.length != 2) {
+                            System.out.println("format: git branch 'branchName'");
+                        }
+                        VCS.createBranch(args[1]);
                     }
-                    VCS.createBranch(args[2]);
                 }
             } else if (args[0].equals(VCS.commands.log.toString())) {
                 System.out.println(new String(VCS.getCurrentBranchLog()));
@@ -118,6 +126,8 @@ public class Main {
             System.out.println("nothing changed since last commit; add some changes using git add");
         } catch (NothingChangedSinceLastAddException e) {
             System.out.println("nothing changed since last add; add some changes using git add");
+        } catch (MasterBranchDeleteException e) {
+            System.out.println("you can't delete master branch");
         }
     }
 

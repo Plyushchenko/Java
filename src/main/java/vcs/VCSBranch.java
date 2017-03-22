@@ -46,7 +46,7 @@ class VCSBranch {
         }
     }
 
-    private static boolean branchExists(String branchName) {
+    static boolean branchExists(String branchName) {
         Path branchLocation = Paths.get(REFS_LOCATION + File.separator + branchName);
         return Files.exists(branchLocation);
     }

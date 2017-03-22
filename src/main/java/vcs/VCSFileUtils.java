@@ -12,7 +12,7 @@ import java.util.List;
 class VCSFileUtils {
 
     static final Path CURRENT_DIRECTORY = Paths.get(System.getProperty("user.dir"));
-    static final Path GIT_LOCATION = Paths.get(CURRENT_DIRECTORY + File.separator + ".git");
+    static final Path GIT_LOCATION = Paths.get(CURRENT_DIRECTORY + File.separator + ".mygit");
     static final Path INDEX_LOCATION = Paths.get(GIT_LOCATION + File.separator + "index");
     static final Path REFS_LOCATION = Paths.get(GIT_LOCATION + File.separator + "refs");
     static final Path HEAD_LOCATION = Paths.get(GIT_LOCATION + File.separator + "HEAD");
@@ -30,7 +30,9 @@ class VCSFileUtils {
 
     static void checkExistenceOfAllFiles(List<Path> paths) throws FileToAddNotExistsException {
         for (Path path : paths) {
-            path = Paths.get(CURRENT_DIRECTORY + File.separator + path);
+            if (!path.isAbsolute()) {
+                path = Paths.get(CURRENT_DIRECTORY + File.separator + path);
+            }
             if (Files.notExists(path)) {
                 throw new FileToAddNotExistsException();
             }

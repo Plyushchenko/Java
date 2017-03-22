@@ -50,7 +50,9 @@ class VCSIndex {
 
         boolean somethingChangedSinceLastAdd = false;
         for (Path fileToAdd : filesToAdd) {
-            fileToAdd = Paths.get(CURRENT_DIRECTORY + File.separator + fileToAdd);
+            if (!fileToAdd.isAbsolute()) {
+                fileToAdd = Paths.get(CURRENT_DIRECTORY + File.separator + fileToAdd);
+            }
             int i = indexedFiles.indexOf(fileToAdd);
             if (i == -1) {
                 indexedFiles.add(fileToAdd);

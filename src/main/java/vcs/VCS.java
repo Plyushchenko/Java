@@ -30,8 +30,10 @@ public class VCS {
 
     public static void init() throws GitAlreadyInitedException, GitInitException {
         isInit = true;
-        if (Files.exists(GIT_LOCATION))
+        if (Files.exists(GIT_LOCATION)) {
+            System.out.println(GIT_LOCATION);
             throw new GitAlreadyInitedException();
+        }
         try {
             createGitDirectories();
             String initialCommitHash = commit("initial commit");
@@ -145,6 +147,24 @@ public class VCS {
         return commit.getHash();
     }
 
+    public static void removeBranch(String branchName) throws NoGitFoundException, NoBranchFoundException, MasterBranchDeleteException {
+        if (Files.notExists(GIT_LOCATION)){
+            throw new NoGitFoundException();
+        }
+        if (!branchExists(branchName)){
+            throw new NoBranchFoundException();
+        }
+        if (branchName.equals(MASTER_BRANCH)){
+            throw new MasterBranchDeleteException();
+        }
+        try {
+            Files.delete(Paths.get(REFS_LOCATION + File.separator + branchName));
+            Files.delete(Paths.get(LOGS_LOCATION + File.separator + branchName));
+        } catch (IOException e) {
+            //ignore
+        }
+
+    }
     public static void merge(String branchToMergeName) throws NoGitFoundException, HeadReadException, ContentWriteException,
             AddException, NoIndexFoundException, FileToAddNotExistsException, NothingChangedSinceLastAddException,
             IndexReadException, BranchWriteException, LogWriteException, BranchReadException, ContentReadException,
@@ -154,10 +174,13 @@ public class VCS {
         }
         String currentBranchName = getCurrentBranchName();
         Path branchToMergeRefLocation = Paths.get(REFS_LOCATION + File.separator + branchToMergeName);
+
         List<String> filePathsAndHashesToMerge = null;
         try {
+            String commitHashToMergeLocation = Files.lines(
+                    Paths.get(OBJECTS_LOCATION + File.separator + Files.lines(branchToMergeRefLocation).findFirst().get())).findFirst().get();
             filePathsAndHashesToMerge = Files.readAllLines(
-                    Paths.get(OBJECTS_LOCATION + File.separator + Files.lines(branchToMergeRefLocation).findFirst().get()));
+                    Paths.get(OBJECTS_LOCATION + File.separator + commitHashToMergeLocation));
         } catch (IOException e) {
             e.printStackTrace();
         }
