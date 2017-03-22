@@ -43,6 +43,7 @@ public class VCS {
             e.printStackTrace();
             throw new GitInitException();
         }
+        isInit = false;
     }
 
     public static void checkout(String arg) throws ContentWriteException, HeadWriteException, TreeReadException, NoBranchFoundException,
@@ -198,7 +199,11 @@ public class VCS {
                 throw new ContentWriteException();
             }
         }
-        add(filesToAdd);
+        try {
+            add(filesToAdd);
+        } catch (NothingChangedSinceLastAddException e) {
+            //ignore
+        }
         commit("merge " + branchToMergeName + " into " + currentBranchName);
 
     }
