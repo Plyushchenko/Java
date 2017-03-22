@@ -27,7 +27,7 @@ public class VCSTests {
     private static final Path INDEX_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "index");
     private static final Path REFS_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "refs");
     private static final Path HEAD_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "HEAD");
-    private static final Path OBJECTS_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "objects");
+    private static final Path OBJECTS_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "pobjects");
     private static final Path LOGS_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "logs");
     private static final List<Path> GIT_FOLDER_AND_ITS_CONTENT = new ArrayList<>(Arrays.asList(GIT_FOLDER_AS_PATH,
             INDEX_LOCATION, REFS_LOCATION, HEAD_LOCATION, OBJECTS_LOCATION, LOGS_LOCATION));
