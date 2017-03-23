@@ -1,0 +1,30 @@
+git init
+Создаёт .git/ и некоторые подпапки
+
+git add file1 file2...
+Добавляет файлы и хеши  (или просто обновляет хеш) их содержимых в .git/index
+
+git commit message
+Коммитит в текущую ветку все файлы из .git/index и их хеши
+
+git branch
+Печатает список веток
+
+git branch branchName
+Создаёт новую ветку
+
+git branch -d branchName
+Удаляет ветку
+
+git checkout -b branch
+Создаёт новую ветку и переключается на неё
+
+git checkout branch
+Переключается на ветку
+
+git checkout hash
+Переключается на коммит с хешом hash. Создаётся ветка с таким именем, её голова указывает на hash
+
+git merge branchName
+Вливает ветку branchName в текущую ветку. Если состояние одного и того же файла разное в двух ветках, то файл будет в состоянии как в branchName.
+Также весь .git/index будет закоммичен.
