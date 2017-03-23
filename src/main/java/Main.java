@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             if (args.length == 0) {
-                System.out.println("you should know how to use this supa hot vcs");
+                System.out.println("read howto.txt");
                 return;
             }
             if (args[0].equals(VCS.commands.init.toString())) {
@@ -66,6 +66,7 @@ public class Main {
                     } else {
                         if (args.length != 2) {
                             System.out.println("format: git branch 'branchName'");
+                            return;
                         }
                         VCS.createBranch(args[1]);
                     }
@@ -112,7 +113,7 @@ public class Main {
             System.out.println("unable to read HEAD file");
         } catch (LogWriteException e) {
             System.out.println("unable to write to log");
-        } catch (DirectioryCreateException e) {
+        } catch (DirectoryCreateException e) {
             System.out.println("unable to create directory");
         } catch (LogReadException e) {
             System.out.println("unable to read log file");
@@ -128,6 +129,8 @@ public class Main {
             System.out.println("nothing changed since last add; add some changes using git add");
         } catch (MasterBranchDeleteException e) {
             System.out.println("you can't delete master branch");
+        } catch (CurrentBranchDeleteException e) {
+            System.out.println("you can't delete current branch");
         }
     }
 

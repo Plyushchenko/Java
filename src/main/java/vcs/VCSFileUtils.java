@@ -25,6 +25,7 @@ class VCSFileUtils {
 
     static void createEmptyFile(Path path) throws IOException {
         Files.deleteIfExists(path);
+        Files.createDirectories(path.getParent());
         Files.createFile(path);
     }
 
@@ -40,7 +41,7 @@ class VCSFileUtils {
     }
 
     static void restoreFiles(String commitHash) throws
-            TreeReadException, ContentReadException, ContentWriteException, DirectioryCreateException {
+            TreeReadException, ContentReadException, ContentWriteException, DirectoryCreateException {
         Path treeLocation = Paths.get(OBJECTS_LOCATION + File.separator + commitHash);
         List<String> filePathsAndHashes;
         try {
@@ -61,7 +62,7 @@ class VCSFileUtils {
             try {
                 Files.createDirectories(fileLocation.getParent());
             } catch (IOException e) {
-                throw new DirectioryCreateException();
+                throw new DirectoryCreateException();
             }
             try {
                 Files.write(fileLocation, fileContent);

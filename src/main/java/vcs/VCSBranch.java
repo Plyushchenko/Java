@@ -71,7 +71,7 @@ class VCSBranch {
      * restore all the files from last commit on branchName
      */
     static void switchToBranch(String branchName) throws NoGitFoundException, NoBranchFoundException, HeadWriteException,
-            BranchReadException, HeadReadException, ContentReadException, ContentWriteException, TreeReadException, DirectioryCreateException {
+            BranchReadException, HeadReadException, ContentReadException, ContentWriteException, TreeReadException, DirectoryCreateException {
         if (Files.notExists(GIT_LOCATION))
             throw new NoGitFoundException();
         if (!isInit() && !branchExists(branchName)) {
@@ -87,10 +87,14 @@ class VCSBranch {
      * create (if not exists) branch commitName and switch to this branch
      */
     static void switchToCommit(String commitHash) throws HeadWriteException, NoGitFoundException, NoBranchFoundException,
-            TreeReadException, HeadReadException, ContentWriteException, ContentReadException, BranchReadException, DirectioryCreateException,
-            LogWriteException, BranchWriteException, BranchAlreadyCreatedException {
+            TreeReadException, HeadReadException, ContentWriteException, ContentReadException, BranchReadException, DirectoryCreateException,
+            LogWriteException, BranchWriteException {
         if (!branchExists(commitHash)) {
-            VCSBranch.createBranch(commitHash, commitHash);
+            try {
+                VCSBranch.createBranch(commitHash, commitHash);
+            } catch (BranchAlreadyCreatedException e) {
+                //ignore
+            }
         }
         switchToBranch(commitHash);
     }

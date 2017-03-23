@@ -1,7 +1,4 @@
-import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import vcs.VCS;
 import vcs.vcsexceptions.*;
@@ -17,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class VCSTests {
@@ -78,7 +74,7 @@ public class VCSTests {
     @Test (expected = NoBranchFoundException.class)
     public void checkoutToNonExistingBranchTest() throws GitAlreadyInitedException, GitInitException, BranchAlreadyCreatedException,
             HeadReadException, BranchReadException, LogWriteException, NoGitFoundException, BranchWriteException, NoBranchFoundException,
-            TreeReadException, ContentReadException, HeadWriteException, ContentWriteException, DirectioryCreateException, IOException {
+            TreeReadException, ContentReadException, HeadWriteException, ContentWriteException, DirectoryCreateException, IOException {
         try {
             VCS.init();
             for (int i = 0; i < 10; i++) {
@@ -127,7 +123,7 @@ public class VCSTests {
             NothingChangedSinceLastAddException, NoIndexFoundException, IndexReadException, AddException,
             FileToAddNotExistsException, NoGitFoundException, BranchReadException, LogWriteException, BranchWriteException,
             BranchAlreadyCreatedException, HeadReadException, NoBranchFoundException, TreeReadException, ContentReadException,
-            HeadWriteException, ContentWriteException, DirectioryCreateException {
+            HeadWriteException, ContentWriteException, DirectoryCreateException {
         try {
             VCS.init();
             List<String> branchNamesList = VCS.buildBranchNamesList();
@@ -151,7 +147,7 @@ public class VCSTests {
             NoIndexFoundException, IndexReadException, AddException, FileToAddNotExistsException, NoGitFoundException,
             BranchReadException, HeadReadException, ContentReadException, NothingChangedSinceLastCommitException,
             ContentWriteException, LogWriteException, BranchWriteException, BranchAlreadyCreatedException, NoBranchFoundException,
-            DirectioryCreateException, TreeReadException, HeadWriteException {
+            DirectoryCreateException, TreeReadException, HeadWriteException {
         try {
             VCS.init();
             Files.createDirectories(FILE_PATHS.get(0).getParent());
@@ -178,7 +174,7 @@ public class VCSTests {
             NoIndexFoundException, IndexReadException, AddException, FileToAddNotExistsException, NoGitFoundException,
             BranchReadException, HeadReadException, ContentReadException, NothingChangedSinceLastCommitException,
             ContentWriteException, LogWriteException, BranchWriteException, BranchAlreadyCreatedException, NoBranchFoundException,
-            DirectioryCreateException, TreeReadException, HeadWriteException {
+            DirectoryCreateException, TreeReadException, HeadWriteException {
         try {
             VCS.init();
             Files.createDirectories(FILE_PATHS.get(2).getParent());
@@ -204,7 +200,7 @@ public class VCSTests {
             NoIndexFoundException, IndexReadException, AddException, FileToAddNotExistsException, NoGitFoundException,
             BranchReadException, HeadReadException, ContentReadException, NothingChangedSinceLastCommitException,
             ContentWriteException, LogWriteException, BranchWriteException, BranchAlreadyCreatedException, NoBranchFoundException,
-            DirectioryCreateException, TreeReadException, HeadWriteException {
+            DirectoryCreateException, TreeReadException, HeadWriteException {
         try {
             VCS.init();
             for (int i = 0; i < 3; i++) {
