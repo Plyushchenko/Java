@@ -1,17 +1,16 @@
 package MD5;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.RecursiveTask;
 
+/**
+ * Multithread type of MD5 hasher
+ * use FJP
+ */
 public class MD5MultiThread implements MD5 {
 
     @Override
@@ -20,12 +19,21 @@ public class MD5MultiThread implements MD5 {
         return buildArrayFromList(tmp);
     }
 
-    private byte[] buildArrayFromList(List<Byte> list) {
+    static byte[] buildArrayFromList(List<Byte> list) {
         byte[] res = new byte[list.size()];
         for (int i = 0; i < list.size(); i++) {
             res[i] = list.get(i);
         }
         return res;
+    }
+
+    static List<Byte> buildListFromArray(byte[] bytes) {
+        List<Byte> res = new ArrayList<>();
+        for (byte b : bytes) {
+            res.add(b);
+        }
+        return res;
+
     }
 
 }
