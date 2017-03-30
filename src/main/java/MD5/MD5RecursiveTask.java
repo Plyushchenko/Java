@@ -1,18 +1,19 @@
 package MD5;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 
+import static MD5.MD5MultiThread.buildListFromArray;
+
+/**
+ * RecursiveTask for MD5 hashing
+ */
 class MD5RecursiveTask extends RecursiveTask<List<Byte>> {
 
     private final Path path;
@@ -21,6 +22,11 @@ class MD5RecursiveTask extends RecursiveTask<List<Byte>> {
         this.path = path;
     }
 
+    /**
+     * build MD5 hash
+     * if path is a folder then fork for all files and subfolders then join
+     * if path is a file then just build hash of file
+     */
     @Override
     protected List<Byte> compute() {
         try {
@@ -52,15 +58,5 @@ class MD5RecursiveTask extends RecursiveTask<List<Byte>> {
         }
         return null;
     }
-
-    private List<Byte> buildListFromArray(byte[] bytes) {
-        List<Byte> res = new ArrayList<>();
-        for (byte b : bytes) {
-            res.add(b);
-        }
-        return res;
-
-    }
-
 
 }
