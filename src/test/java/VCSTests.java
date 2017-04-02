@@ -1,23 +1,8 @@
-import org.apache.commons.io.FileUtils;
-import org.junit.Test;
-import vcs.VCS;
-import vcs.vcsexceptions.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class VCSTests {
-
+/*
     private static File GIT_FOLDER_AS_FILE = new File("./mygit");
     private static Path GIT_FOLDER_AS_PATH = Paths.get("./mygit");
     private static final Path INDEX_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "index");
@@ -235,5 +220,5 @@ public class VCSTests {
         }
         return false;
     }
-
+*/
 }
