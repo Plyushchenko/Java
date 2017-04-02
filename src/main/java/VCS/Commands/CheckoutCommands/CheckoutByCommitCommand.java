@@ -4,7 +4,7 @@ import VCS.Commands.Command;
 import VCS.Commands.CommitCommand;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
-import VCS.Exceptions.UncommitedChangesException;
+import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.HEAD;
@@ -24,7 +24,7 @@ public class CheckoutByCommitCommand extends Command {
 
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
-            UncommitedChangesException {
+            UncommittedChangesException {
         checkArgsCorrectness();
         new CommitCommand(fileSystem).checkFiles();
         Path treeLocation = fileSystem.buildObjectLocation(fileSystem.getFileContentAsString(

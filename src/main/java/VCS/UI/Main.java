@@ -4,8 +4,15 @@ import VCS.Data.FileSystem;
 import VCS.Repo;
 import VCS.RepoImpl;
 
+/**
+ * User interface
+ */
 public class Main {
 
+    /**
+     * Execute command by passing args to RepoImpl instance
+     * @param args Command line arguments
+     */
     public static void main(String[] args) {
         try {
             if (args.length == 0) {

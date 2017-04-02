@@ -3,7 +3,7 @@ package VCS.Commands;
 import javafx.util.Pair;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
-import VCS.Exceptions.UncommitedChangesException;
+import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.*;
 import VCS.Objects.GitObjects.Blob;
@@ -63,12 +63,12 @@ public class CommitCommand extends Command {
     }
 
     public void checkFiles() throws IOException, UnstagedChangesException,
-            UncommitedChangesException {
+            UncommittedChangesException {
         if (new HEAD(fileSystem).getCurrentBranch().equals("")){
             return;
         }
         checkForUnstagedFiles();
-        checkForUncommitedFiles();
+        checkForUncommittedFiles();
     }
 
     private void checkForUnstagedFiles() throws IOException, UnstagedChangesException {
@@ -92,26 +92,25 @@ public class CommitCommand extends Command {
         }
     }
 
-    private void checkForUncommitedFiles() throws IOException, UncommitedChangesException {
+    private void checkForUncommittedFiles() throws IOException, UncommittedChangesException {
         Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
                 fileSystem.getIndexLocation());
         List<String> indexedFiles = indexContent.getKey();
         List<String> indexedHashes = indexContent.getValue();
         Pair<List<String>, List<String>> treeContent = fileSystem.splitLines(fileSystem
                 .buildTreeLocation(new HEAD(fileSystem).getCurrentBranch()));
-        System.out.println("commit command: treeContent: " + treeContent.toString());
-        List<String> commitedFiles = treeContent.getKey();
-        List<String> commitedHashes = treeContent.getValue();
-        String uncommitedFiles = "";
+        List<String> committedFiles = treeContent.getKey();
+        List<String> committedHashes = treeContent.getValue();
+        String UncommittedFiles = "";
         for (int i = 0; i < indexedFiles.size(); i++) {
-            int j = commitedFiles.indexOf(indexedFiles.get(i));
-            if (j == -1 || !commitedHashes.get(j).equals(indexedHashes.get(i))) {
-                uncommitedFiles += indexedFiles.get(i) + "\n";
+            int j = committedFiles.indexOf(indexedFiles.get(i));
+            if (j == -1 || !committedHashes.get(j).equals(indexedHashes.get(i))) {
+                UncommittedFiles += indexedFiles.get(i) + "\n";
             }
         }
-        if (!uncommitedFiles.equals("")) {
-            uncommitedFiles = "Commit these files:\n" + uncommitedFiles;
-            throw new UncommitedChangesException(uncommitedFiles);
+        if (!UncommittedFiles.equals("")) {
+            UncommittedFiles = "Commit these files:\n" + UncommittedFiles;
+            throw new UncommittedChangesException(UncommittedFiles);
         }
 
     }

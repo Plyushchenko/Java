@@ -26,7 +26,7 @@ public class Tree extends GitObject {
     private static byte[] buildContent(List<String> filesToCommit, List<String>
             hashesOfFilesToCommit) {
         String buffer = "";
-        for (int i = 0; i < filesToCommit.size(); i++){
+        for (int i = 0; i < filesToCommit.size(); i++) {
             buffer += filesToCommit.get(i) + "\n" + hashesOfFilesToCommit.get(i) + "\n";
         }
         return buffer.getBytes();

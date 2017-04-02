@@ -4,7 +4,7 @@ import VCS.Commands.Command;
 import VCS.Commands.CommitCommand;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
-import VCS.Exceptions.UncommitedChangesException;
+import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.HEAD;
@@ -19,16 +19,14 @@ public class CheckoutByBranchCommand extends Command {
         super(fileSystem);
         this.branchName = branchName;
         repoHEAD = new HEAD(fileSystem);
-        System.out.println("checkout by branch: " + branchName);
     }
 
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
-            UncommitedChangesException {
+            UncommittedChangesException {
         checkArgsCorrectness();
         new CommitCommand(fileSystem).checkFiles();
         Path treeLocation = fileSystem.buildTreeLocation(branchName);
-        System.out.println("checkout by branch: treeLocation " + treeLocation);
         fileSystem.restoreFiles(fileSystem.splitLines(treeLocation));
         fileSystem.copyFile(treeLocation, fileSystem.getIndexLocation());
         repoHEAD.updateHEAD(branchName);

@@ -9,7 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * class for VCS objects. can create SHA1 hash from object content
+ * Git object
  */
 public abstract class GitObject {
 
@@ -29,14 +29,26 @@ public abstract class GitObject {
         this.content = content;
     }
 
+    /**
+     * Get SHA1 hash
+     * @return SHA1 hash
+     */
     public String getHash() {
         return hash;
     }
 
+    /**
+     * Get type of Git object (i.e. blob/commit/tree)
+     * @return type of Git object
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Get size of Git objects in bytes
+     * @return size of Git object
+     */
     public int getSize() {
         return size;
     }
@@ -48,23 +60,25 @@ public abstract class GitObject {
     /**
      * add VCS object content to objects/getHash() file
      */
+    /**
+     * add VCS object content to objects/getHash() file
+     * @throws IOException Unknown IO problem
+     */
     public void addObject() throws IOException {
         fileSystem.writeToFile(Paths.get(
                 fileSystem.getObjectsLocation() + File.separator + getHash()), getContent());
     }
 
-    /**
-     * build SHA1 hash from VCS object content as byte array
-     */
-    static String buildHash(byte[] content){
+    static String buildHash(byte[] content) {
         MessageDigest digest = null;
         try {
             digest = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
             //ignore
         }
-        if (digest == null)
+        if (digest == null) {
             return "";
+        }
         digest.update(content);
         return javax.xml.bind.DatatypeConverter.printHexBinary(digest.digest()).toLowerCase();
 

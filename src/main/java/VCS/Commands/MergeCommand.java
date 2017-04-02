@@ -2,8 +2,9 @@ package VCS.Commands;
 
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
-import VCS.Exceptions.UncommitedChangesException;
+import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import VCS.Objects.HEAD;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -19,8 +20,17 @@ public class MergeCommand extends Command {
         this.branchName = branchName;
     }
 
+    /**
+     *      * If any file has different states at these two branches then the state of this file will be
+     * equal to the state of this file at 'branchName' branch
+
+     * @throws UnstagedChangesException
+     * @throws IOException
+     * @throws UncommittedChangesException
+     * @throws IncorrectArgsException
+     */
     @Override
-    public void run() throws UnstagedChangesException, IOException, UncommitedChangesException,
+    public void run() throws UnstagedChangesException, IOException, UncommittedChangesException,
             IncorrectArgsException {
         new CommitCommand(fileSystem).checkFiles();
 
@@ -52,13 +62,15 @@ public class MergeCommand extends Command {
                                 fileSystem.buildObjectLocation(mergingHashes.get(i))));
             }
         }
-        new AddCommand(fileSystem, filesToAdd);
+        new AddCommand(fileSystem, filesToAdd).run();
         new CommitCommand(fileSystem, "merge '" + branchName + "' branch").run();
     }
 
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {
-
+    public void checkArgsCorrectness() throws IncorrectArgsException, IOException {
+        if (branchName.equals(new HEAD(fileSystem).getCurrentBranch())) {
+            throw new IncorrectArgsException("this is a current branch");
+        }
     }
 
 }

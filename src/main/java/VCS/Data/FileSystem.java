@@ -42,6 +42,7 @@ public abstract class FileSystem {
         return logsLocation;
     }
 
+    private boolean gitExists = true;
     final Path workingDirectory;
     private final Path gitLocation;
     private final Path indexLocation;
@@ -52,12 +53,30 @@ public abstract class FileSystem {
 
     public FileSystem(Path workingDirectory) {
         this.workingDirectory = workingDirectory;
-        gitLocation = Paths.get(workingDirectory + File.separator + ".mygit");
+        Path tmp = Paths.get(workingDirectory + File.separator + ".mygit");
+        while (Files.notExists(tmp)) {
+            tmp = tmp.getParent().getParent();
+            if (tmp == null){
+                gitExists = false;
+                break;
+            }
+            tmp = Paths.get(tmp + File.separator + ".mygit");
+            System.out.println(tmp);
+        }
+        gitLocation = tmp;
         indexLocation = Paths.get(gitLocation + File.separator + "index");
         refsLocation = Paths.get(gitLocation + File.separator + "refs");
         HEADLocation = Paths.get(gitLocation + File.separator + "HEAD");
         objectsLocation = Paths.get(gitLocation + File.separator + "objects");
         logsLocation = Paths.get(gitLocation + File.separator + "logs");
+    }
+
+    public boolean gitExists() {
+        return gitExists;
+    }
+
+    public boolean gitNotExists() {
+        return !gitExists;
     }
 
     public abstract void createDirectory(Path path) throws IOException;
@@ -147,4 +166,5 @@ public abstract class FileSystem {
     public abstract void copyFile(Path commitPath, Path indexLocation) throws IOException;
 
     public abstract Path buildTreeLocation(String branchName) throws IOException;
+
 }

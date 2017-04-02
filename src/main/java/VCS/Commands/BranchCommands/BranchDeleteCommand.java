@@ -5,6 +5,7 @@ import VCS.Commands.Command;
 import VCS.Data.FileSystem;
 import VCS.Objects.HEAD;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Objects.Log;
 
 import java.io.IOException;
 
@@ -19,7 +20,7 @@ public class BranchDeleteCommand extends Command {
     @Override
     public void run() throws IOException, IncorrectArgsException {
         checkArgsCorrectness();
-        branch.deleteLog();
+        new Log(fileSystem, branch.getBranchName()).delete();
         branch.deleteRef();
     }
 

@@ -4,7 +4,7 @@ import VCS.Commands.BranchCommands.BranchCreateCommand;
 import VCS.Commands.CheckoutCommands.CheckoutByBranchCommand;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
-import VCS.Exceptions.UncommitedChangesException;
+import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class InitCommand extends Command {
 
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
-            UncommitedChangesException {
+            UncommittedChangesException {
         createGitDirectoriesAndFiles();
         CommitCommand initialCommitCommand = new CommitCommand(fileSystem, "initial commit");
         initialCommitCommand.run();

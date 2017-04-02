@@ -2,7 +2,7 @@ package VCS.Commands;
 
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
-import VCS.Exceptions.UncommitedChangesException;
+import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ public abstract class Command {
     }
 
     public abstract void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
-            UncommitedChangesException;
+            UncommittedChangesException;
 
     public abstract void checkArgsCorrectness() throws IncorrectArgsException, IOException;
 }
