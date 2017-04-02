@@ -45,13 +45,13 @@ class Parser {
         }
     }
 
-    public void checkInitArgsFormatCorrectness() throws IncorrectArgsException {
+    void checkInitArgsFormatCorrectness() throws IncorrectArgsException {
         if (args.length != 1) {
             throw new IncorrectArgsException("format: git init");
         }
     }
 
-    public void checkLogArgsFormatCorrectness() throws IncorrectArgsException {
+    void checkLogArgsFormatCorrectness() throws IncorrectArgsException {
         if (args.length != 1) {
             throw new IncorrectArgsException("format: git log");
         }
@@ -63,7 +63,7 @@ class Parser {
         }
     }
 
-    public List<String> extractAddCommandArguments() throws IncorrectArgsException {
+    List<String> extractAddCommandArguments() throws IncorrectArgsException {
         checkAddArgsFormatCorrectness();
         return new ArrayList<>(Arrays.asList(args).subList(1, args.length));
     }
@@ -96,4 +96,8 @@ class Parser {
         return true;
     }
 
+    String extractMergeCommandArguments() throws IncorrectArgsException {
+        checkMergeArgsFormatCorrectness();
+        return args[1];
+    }
 }

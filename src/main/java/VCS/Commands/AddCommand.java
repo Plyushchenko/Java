@@ -11,7 +11,7 @@ import java.util.List;
 public class AddCommand extends Command {
 
     private final List<String> filePaths;
-    public AddCommand(List<String> filePaths, FileSystem fileSystem) {
+    public AddCommand(FileSystem fileSystem, List<String> filePaths) {
         super(fileSystem);
         this.filePaths = filePaths;
     }

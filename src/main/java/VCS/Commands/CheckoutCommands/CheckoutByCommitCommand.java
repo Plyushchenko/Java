@@ -27,7 +27,6 @@ public class CheckoutByCommitCommand extends Command {
             UncommitedChangesException {
         checkArgsCorrectness();
         new CommitCommand(fileSystem).checkFiles();
-        System.out.println(fileSystem.buildObjectLocation(commitHash));
         Path treeLocation = fileSystem.buildObjectLocation(fileSystem.getFileContentAsString(
                 fileSystem.buildObjectLocation(commitHash)));
         fileSystem.restoreFiles(fileSystem.splitLines(treeLocation));
@@ -35,7 +34,6 @@ public class CheckoutByCommitCommand extends Command {
         String currentBranch = new HEAD(fileSystem).getCurrentBranch();
         new Branch(fileSystem, currentBranch).updateRef(commitHash);
         new Log(fileSystem, currentBranch).write(buildCheckoutByCommitInformation());
-
     }
 
     private String buildCheckoutByCommitInformation() {

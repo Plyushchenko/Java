@@ -21,9 +21,7 @@ public class LogCommand extends Command {
     }
 
     @Override
-    public void checkArgsCorrectness() {
-
-    }
+    public void checkArgsCorrectness() {}
 
     public String getLog() {
         return log;

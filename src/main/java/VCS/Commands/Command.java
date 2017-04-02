@@ -14,7 +14,8 @@ public abstract class Command {
         this.fileSystem = fileSystem;
     }
 
-    public abstract void run() throws IncorrectArgsException, IOException, UnstagedChangesException, UncommitedChangesException;
+    public abstract void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
+            UncommitedChangesException;
 
     public abstract void checkArgsCorrectness() throws IncorrectArgsException, IOException;
 }

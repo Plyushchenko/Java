@@ -115,14 +115,10 @@ public class FileSystemImpl extends FileSystem {
     }
 
     @Override
-    public Path buildCommitLocation(String branchName) throws IOException {
-        Path refLocation = buildRefLocation(branchName);
-        return buildObjectLocation(getFileContentAsString(refLocation));
-    }
-
-    @Override
     public Path buildTreeLocation(String branchName) throws IOException {
-        return buildObjectLocation(getFileContentAsString(buildCommitLocation(branchName)));
+        Path refLocation = buildRefLocation(branchName);
+        Path commitLocation =  buildObjectLocation(getFileContentAsString(refLocation));
+        return buildObjectLocation(getFileContentAsString(commitLocation));
     }
 
 }

@@ -11,7 +11,6 @@ import java.util.List;
 public class BranchListCommand extends Command {
 
     private String branchListAsString;
-
     public BranchListCommand(FileSystem fileSystem) {
         super(fileSystem);
     }
@@ -33,10 +32,9 @@ public class BranchListCommand extends Command {
             }
         }
     }
-    @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {
 
-    }
+    @Override
+    public void checkArgsCorrectness() throws IncorrectArgsException {}
 
     public String getBranchList() {
         return branchListAsString;

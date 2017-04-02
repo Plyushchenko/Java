@@ -146,7 +146,5 @@ public abstract class FileSystem {
 
     public abstract void copyFile(Path commitPath, Path indexLocation) throws IOException;
 
-    public abstract Path buildCommitLocation(String branchName) throws IOException;
-
     public abstract Path buildTreeLocation(String branchName) throws IOException;
 }

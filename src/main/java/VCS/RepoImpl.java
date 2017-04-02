@@ -1,14 +1,11 @@
 package VCS;
 
-import VCS.Commands.AddCommand;
+import VCS.Commands.*;
 import VCS.Commands.BranchCommands.BranchCreateCommand;
 import VCS.Commands.BranchCommands.BranchDeleteCommand;
 import VCS.Commands.BranchCommands.BranchListCommand;
 import VCS.Commands.CheckoutCommands.CheckoutByBranchCommand;
 import VCS.Commands.CheckoutCommands.CheckoutByCommitCommand;
-import VCS.Commands.CommitCommand;
-import VCS.Commands.InitCommand;
-import VCS.Commands.LogCommand;
 import VCS.Data.FileSystem;
 import VCS.Data.FileSystemImpl;
 import VCS.Exceptions.IncorrectArgsException;
@@ -36,7 +33,7 @@ public class RepoImpl implements Repo {
             UnstagedChangesException, UncommitedChangesException {
         String principleCommandAsString = parser.getPrincipleCommandAsString();
         if (!COMMANDS.contains(principleCommandAsString)) {
-            throw new NoSuchCommandException("No such command; please read howto.txt");
+            throw new NoSuchCommandException("No such command");
         }
         switch (principleCommandAsString) {
             case "add":
@@ -60,21 +57,20 @@ public class RepoImpl implements Repo {
                 log();
                 break;
             case "merge":
-                merge();
+                merge(parser.extractMergeCommandArguments());
                 break;
         }
     }
 
     @Override
     public void add(List<String> args) throws IncorrectArgsException, IOException {
-        new AddCommand(args, fileSystem).run();
+        new AddCommand(fileSystem, args).run();
+        response = "successful add";
     }
-
 
     @Override
     public void branch(List<String> args) throws IOException, IncorrectArgsException,
             UnstagedChangesException, UncommitedChangesException {
-
         if (args.size() == 0) {
             BranchListCommand branchListCommand = new BranchListCommand(fileSystem);
             branchListCommand.run();
@@ -113,7 +109,8 @@ public class RepoImpl implements Repo {
     }
 
     @Override
-    public void commit(String message) throws IncorrectArgsException, IOException, UnstagedChangesException {
+    public void commit(String message) throws IncorrectArgsException, IOException,
+            UnstagedChangesException {
         CommitCommand commitCommand = new CommitCommand(fileSystem, message);
         commitCommand.run();
         response = commitCommand.getCommitHash();
@@ -123,6 +120,7 @@ public class RepoImpl implements Repo {
     public void init() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommitedChangesException {
         new InitCommand(fileSystem).run();
+        response = "Initialized empty Git repository in " + fileSystem.getGitLocation();
     }
 
     @Override
@@ -133,8 +131,10 @@ public class RepoImpl implements Repo {
     }
 
     @Override
-    public void merge() {
-
+    public void merge(String branchName) throws IncorrectArgsException, UncommitedChangesException,
+            UnstagedChangesException, IOException {
+        new MergeCommand(fileSystem, branchName).run();
+        response = "'" + branchName + "' branch merged into current branch";
     }
 
     @Override

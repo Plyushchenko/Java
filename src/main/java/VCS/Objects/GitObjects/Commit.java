@@ -32,6 +32,7 @@ public class Commit extends GitObject {
      */
     @Override
     public String toString() {
-        return getHash() + " " + getCommitMessage() + " " + getCommitAuthor() + " " + getCommitDate() + "\n";
+        return getHash() + " " + getCommitMessage() + " " + getCommitAuthor() + " " +
+                getCommitDate() + "\n";
     }
 }
