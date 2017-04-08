@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/** File utils for git*/
 public abstract class FileSystem {
 
     public static final Path DEFAULT_WORKING_DIRECTORY = Paths.get(System.getProperty("user.dir"));
@@ -30,8 +31,8 @@ public abstract class FileSystem {
         return refsLocation;
     }
 
-    public Path getHEADLocation() {
-        return HEADLocation;
+    public Path getHeadLocation() {
+        return headLocation;
     }
 
     public Path getObjectsLocation() {
@@ -47,7 +48,7 @@ public abstract class FileSystem {
     private final Path gitLocation;
     private final Path indexLocation;
     final Path refsLocation;
-    private final Path HEADLocation;
+    private final Path headLocation;
     final Path objectsLocation;
     final Path logsLocation;
 
@@ -66,7 +67,7 @@ public abstract class FileSystem {
         gitLocation = tmp;
         indexLocation = Paths.get(gitLocation + File.separator + "index");
         refsLocation = Paths.get(gitLocation + File.separator + "refs");
-        HEADLocation = Paths.get(gitLocation + File.separator + "HEAD");
+        headLocation = Paths.get(gitLocation + File.separator + "HEAD");
         objectsLocation = Paths.get(gitLocation + File.separator + "objects");
         logsLocation = Paths.get(gitLocation + File.separator + "logs");
     }
@@ -81,7 +82,7 @@ public abstract class FileSystem {
 
     public abstract void createDirectory(Path path) throws IOException;
 
-    public abstract void createFileOrClearIfExists(Path headLocation) throws IOException;
+    public abstract void createFileOrClearIfExists(Path path) throws IOException;
 
     void createFileIfNotExists(Path path) throws IOException {
         if (Files.notExists(path)) {
@@ -163,8 +164,13 @@ public abstract class FileSystem {
 
     public abstract byte[] getFileContentAsByteArray(Path path) throws IOException;
 
-    public abstract void copyFile(Path commitPath, Path indexLocation) throws IOException;
+    public void copyFile(Path src, Path dest) throws IOException {
+        writeToFile(dest, getFileContentAsByteArray(src));
+    }
 
     public abstract Path buildTreeLocation(String branchName) throws IOException;
 
+    public abstract void restoreFile(String pathAsString, String objectHash) throws IOException;
+
+    public abstract void createGitDirectoriesAndFiles() throws IOException;
 }

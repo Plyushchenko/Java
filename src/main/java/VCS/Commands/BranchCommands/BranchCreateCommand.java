@@ -1,5 +1,6 @@
 package VCS.Commands.BranchCommands;
 
+import VCS.Commands.CheckFilesStateCommand;
 import VCS.Commands.Command;
 import VCS.Commands.CommitCommand;
 import VCS.Data.FileSystem;
@@ -7,38 +8,61 @@ import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
-import VCS.Objects.HEAD;
+import VCS.Objects.Head;
 import VCS.Objects.Log;
 
 import java.io.IOException;
 import java.util.Date;
 
+/** Branch create command */
 public class BranchCreateCommand extends Command {
-    private final HEAD repoHEAD;
+    private final Head repoHead;
     private final Branch branch;
+
     public BranchCreateCommand(FileSystem fileSystem, String branchName) {
         super(fileSystem);
         branch = new Branch(fileSystem, branchName);
-        repoHEAD = new HEAD(fileSystem);
+        repoHead = new Head(fileSystem);
     }
 
+    /**
+     * Create branch.
+     * <pre>
+     * Check that files are staged and committed
+     * Update log with information about branch creation
+     * Update ref of branch with head commit hash of current branch
+     * </pre>
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @Override
-    public void run() throws IOException, IncorrectArgsException, UnstagedChangesException,
+    public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
         checkArgsCorrectness();
-        new CommitCommand(fileSystem).checkFiles();
-
-        new Log(fileSystem, repoHEAD.getCurrentBranch()).write(
-                buildCreateInformation(repoHEAD.getHEADCommitHash()));
-        branch.updateRef(repoHEAD.getHEADCommitHash());
+        new CheckFilesStateCommand(fileSystem).run();
+        new Log(fileSystem, repoHead.getCurrentBranchName()).write(
+                buildCreateInformation(repoHead.getHeadCommitHash()));
+        branch.updateRef(repoHead.getHeadCommitHash());
     }
 
+    /**
+     * Create 'master' branch.
+     * Update log with information about 'master' branch creation
+     * @param initialCommitHash Hash of initial commit
+     * @throws IOException Unknown IO problem
+     */
     public void runMaster(String initialCommitHash) throws IOException {
-        new Log(fileSystem, repoHEAD.getCurrentBranch()).write(
+        new Log(fileSystem, repoHead.getCurrentBranchName()).write(
                 buildCreateInformation(initialCommitHash));
         branch.updateRef(initialCommitHash);
     }
 
+    /**
+     * Check that branch doesn't exist
+     * @throws IncorrectArgsException Incorrect args passed
+     */
     @Override
     public void checkArgsCorrectness() throws IncorrectArgsException {
         if (branch.exists()) {
@@ -47,13 +71,13 @@ public class BranchCreateCommand extends Command {
     }
 
     private String buildCreateInformation(String commitHash) throws IOException {
-        String currentBranch = new HEAD(fileSystem).getCurrentBranch();
-        if (currentBranch.equals("")) {
-            currentBranch = "new repo";
+        String currentBranchName = new Head(fileSystem).getCurrentBranchName();
+        if (currentBranchName.equals("")) {
+            currentBranchName = "new repo";
         } else {
-            currentBranch = "'" + currentBranch + "' branch";
+            currentBranchName = "'" + currentBranchName + "' branch";
         }
-        return commitHash + " branch created from " + currentBranch + " " +
+        return commitHash + " branch created from " + currentBranchName + " " +
                 new Date(System.currentTimeMillis()) + "\n";
     }
 }

@@ -20,7 +20,6 @@ public abstract class GitObject {
     private final int size;
     private final byte[] content;
 
-
     GitObject(FileSystem fileSystem, String hash, String type, int size, byte[] content) {
         this.fileSystem = fileSystem;
         this.hash = hash;
@@ -57,9 +56,6 @@ public abstract class GitObject {
         return content;
     }
 
-    /**
-     * add VCS object content to objects/getHash() file
-     */
     /**
      * add VCS object content to objects/getHash() file
      * @throws IOException Unknown IO problem

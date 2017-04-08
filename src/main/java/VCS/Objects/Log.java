@@ -12,11 +12,6 @@ public class Log {
     private final FileSystem fileSystem;
     private final Path logLocation;
 
-    /**
-     * Build Log instance
-     * @param fileSystem File system
-     * @param branchName Branch name
-     */
     public Log(FileSystem fileSystem, String branchName) {
         this.fileSystem = fileSystem;
         logLocation = fileSystem.buildLogLocation(branchName);

@@ -5,16 +5,12 @@ import VCS.Data.FileSystem;
 import java.io.IOException;
 
 /**
- * HEAD
+ * Head
  */
-public class HEAD {
+public class Head {
     private final FileSystem fileSystem;
 
-    /**
-     * Build HEAD instance
-     * @param fileSystem File system
-     */
-    public HEAD(FileSystem fileSystem) {
+    public Head(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
 
@@ -23,8 +19,8 @@ public class HEAD {
      * @return Current branch name
      * @throws IOException Unknown IO problems
      */
-    public String getCurrentBranch() throws IOException {
-        return fileSystem.getFileContentAsString(fileSystem.getHEADLocation());
+    public String getCurrentBranchName() throws IOException {
+        return fileSystem.getFileContentAsString(fileSystem.getHeadLocation());
     }
 
     /**
@@ -32,18 +28,18 @@ public class HEAD {
      * @return Current commit hash of current branch
      * @throws IOException Unknown IO problems
      */
-    public String getHEADCommitHash() throws IOException {
-        String currentBranch = getCurrentBranch();
-        return fileSystem.getFileContentAsString(fileSystem.buildRefLocation(currentBranch));
+    public String getHeadCommitHash() throws IOException {
+        String currentBranchName = getCurrentBranchName();
+        return fileSystem.getFileContentAsString(fileSystem.buildRefLocation(currentBranchName));
     }
 
     /**
-     * Update HEAD
+     * Update Head
      * @param branchName Branch name
      * @throws IOException Unknown IO problems
      */
-    public void updateHEAD(String branchName) throws IOException {
-        fileSystem.writeToFile(fileSystem.getHEADLocation(), branchName);
+    public void updateHead(String branchName) throws IOException {
+        fileSystem.writeToFile(fileSystem.getHeadLocation(), branchName);
     }
 
 }

@@ -16,14 +16,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-/**
- * Repo implementation
- */
+
+import static VCS.Repo.RepoCommand.*;
+
+/** Repo implementation */
 public class RepoImpl implements Repo {
 
     private final Parser parser;
     private final FileSystem fileSystem;
-    private String response;
 
     public RepoImpl(String[] args, Path workingDirectory) {
         parser = new Parser(args);
@@ -39,42 +39,34 @@ public class RepoImpl implements Repo {
      * @throws UncommittedChangesException Changes were not committed
      */
     @Override
-    public void execute() throws IncorrectArgsException, IOException,
+    public String execute() throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
-        String principleCommandAsString = parser.getPrincipleCommandAsString();
-        if (!COMMANDS.contains(principleCommandAsString)) {
-            throw new IncorrectArgsException("No such command");
-        }
-        if (fileSystem.gitExists() && principleCommandAsString.equals("init")) {
+        RepoCommand principleCommand = valueOf(parser.getPrincipleCommandAsString());
+        if (fileSystem.gitExists() && principleCommand == INIT) {
             throw new IncorrectArgsException("Git already exists");
         }
-        if (fileSystem.gitNotExists() && !principleCommandAsString.equals("init")) {
+        if (fileSystem.gitNotExists() && !(principleCommand == INIT)) {
             throw new IncorrectArgsException("Git doesn't exists");
         }
-        switch (principleCommandAsString) {
-            case "add":
-                add(parser.extractAddCommandArguments());
-                break;
-            case "branch":
-                branch(parser.extractBranchCommandArguments());
-                break;
-            case "checkout":
-                checkout(parser.extractCheckoutCommandArguments());
-                break;
-            case "commit":
-                commit(parser.extractCommitCommandArguments());
-                break;
-            case "init":
+        switch (principleCommand) {
+            case ADD:
+                return add(parser.extractAddCommandArguments());
+            case BRANCH:
+                return branch(parser.extractBranchCommandArguments());
+            case CHECKOUT:
+                return checkout(parser.extractCheckoutCommandArguments());
+            case COMMIT:
+                return commit(parser.extractCommitCommandArguments());
+            case INIT:
                 parser.checkInitArgsFormatCorrectness();
-                init();
-                break;
-            case "log":
+                return init();
+            case LOG:
                 parser.checkLogArgsFormatCorrectness();
-                log();
-                break;
-            case "merge":
-                merge(parser.extractMergeCommandArguments());
-                break;
+                return log();
+            case MERGE:
+                return merge(parser.extractMergeCommandArguments());
+            default:
+                throw new IncorrectArgsException("No such command");
         }
     }
 
@@ -85,15 +77,15 @@ public class RepoImpl implements Repo {
      * @throws IOException Unknown IO problem
      */
     @Override
-    public void add(List<String> args) throws IncorrectArgsException, IOException {
+    public String add(List<String> args) throws IncorrectArgsException, IOException {
         new AddCommand(fileSystem, args).run();
-        response = "successful add";
+        return "successful add";
     }
 
 
     /**
      * Execute 'git branch ...'.
-     *<pre>
+     * <pre>
      * git branch: build branch list (as String)
      * git branch branchName: create 'branchName' branch
      * git branch -d branchName: delete 'branchName' branch
@@ -105,12 +97,12 @@ public class RepoImpl implements Repo {
      * @throws UncommittedChangesException Changes were not committed
      */
     @Override
-    public void branch(List<String> args) throws IncorrectArgsException, IOException,
+    public String branch(List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
         if (args.size() == 0) {
             BranchListCommand branchListCommand = new BranchListCommand(fileSystem);
             branchListCommand.run();
-            response = branchListCommand.getBranchList();
+            return branchListCommand.getBranchList();
         } else {
             String branchName;
             if (args.size() == 1) {
@@ -118,13 +110,13 @@ public class RepoImpl implements Repo {
                 BranchCreateCommand branchCreateCommand = new BranchCreateCommand(fileSystem,
                         branchName);
                 branchCreateCommand.run();
-                response = "branch " + branchName + " created";
+                return "branch " + branchName + " created";
             } else {
                 branchName = args.get(1);
                 BranchDeleteCommand branchDeleteCommand = new BranchDeleteCommand(fileSystem,
                         branchName);
                 branchDeleteCommand.run();
-                response = "branch " + branchName + " deleted";
+                return "branch " + branchName + " deleted";
             }
         }
     }
@@ -143,17 +135,23 @@ public class RepoImpl implements Repo {
      * @throws UncommittedChangesException Changes were not committed
      */
     @Override
-    public void checkout(List<String> args) throws IOException, IncorrectArgsException,
+    public String checkout(List<String> args) throws IOException, IncorrectArgsException,
             UnstagedChangesException, UncommittedChangesException {
         if (args.size() == 1) {
             if (parser.isHash(args.get(0))) {
-                new CheckoutByCommitCommand(fileSystem, args.get(0)).run();
+                String commitHash = args.get(0);
+                new CheckoutByCommitCommand(fileSystem, commitHash).run();
+                return "checkout: " +  commitHash + " commit";
             } else {
-                new CheckoutByBranchCommand(fileSystem, args.get(0)).run();
+                String branchName = args.get(0);
+                new CheckoutByBranchCommand(fileSystem, branchName).run();
+                return "checkout: '" + branchName + "' branch";
             }
         } else {
-            new BranchCreateCommand(fileSystem, args.get(1)).run();
-            new CheckoutByBranchCommand(fileSystem, args.get(1)).run();
+            String branchName = args.get(1);
+            new BranchCreateCommand(fileSystem, branchName).run();
+            new CheckoutByBranchCommand(fileSystem, branchName).run();
+            return "create & checkout: '" + branchName + "' branch";
         }
     }
 
@@ -165,11 +163,11 @@ public class RepoImpl implements Repo {
      * @throws UnstagedChangesException Changes were not staged
      */
     @Override
-    public void commit(String message) throws IncorrectArgsException, IOException,
-            UnstagedChangesException {
+    public String commit(String message) throws IncorrectArgsException, IOException,
+            UnstagedChangesException, UncommittedChangesException {
         CommitCommand commitCommand = new CommitCommand(fileSystem, message);
         commitCommand.run();
-        response = commitCommand.getCommitHash();
+        return commitCommand.getCommitHash();
     }
 
     /**
@@ -180,10 +178,10 @@ public class RepoImpl implements Repo {
      * @throws UncommittedChangesException Changes were not committed
      */
     @Override
-    public void init() throws IncorrectArgsException, IOException, UnstagedChangesException,
+    public String init() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
         new InitCommand(fileSystem).run();
-        response = "Initialized empty Git repository in " + fileSystem.getGitLocation();
+        return "Initialized Git repository in " + fileSystem.getGitLocation();
     }
 
     /**
@@ -191,10 +189,10 @@ public class RepoImpl implements Repo {
      * @throws IOException Unknown IO problem
      */
     @Override
-    public void log() throws IOException {
+    public String log() throws IOException {
         LogCommand logCommand = new LogCommand(fileSystem);
         logCommand.run();
-        response = logCommand.getLog();
+        return logCommand.getLog();
     }
 
     /**
@@ -207,18 +205,10 @@ public class RepoImpl implements Repo {
      * @throws UncommittedChangesException Changes were not committed
      */
     @Override
-    public void merge(String branchName) throws IncorrectArgsException, UncommittedChangesException,
+    public String merge(String branchName) throws IncorrectArgsException, UncommittedChangesException,
             UnstagedChangesException, IOException {
         new MergeCommand(fileSystem, branchName).run();
-        response = "'" + branchName + "' branch merged into current branch";
+        return "'" + branchName + "' branch merged into current branch";
     }
 
-    /**
-     * Get command response
-     * @return Command response
-     */
-    @Override
-    public String getResponse() {
-        return response;
-    }
 }

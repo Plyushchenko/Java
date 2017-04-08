@@ -9,16 +9,28 @@ import VCS.Exceptions.UnstagedChangesException;
 
 import java.io.IOException;
 
+/** Init command */
 public class InitCommand extends Command {
 
     public InitCommand(FileSystem fileSystem) {
         super(fileSystem);
     }
 
+    /**
+     * Init.
+     * <pre>
+     * Create directories anf files for repo
+     * Excecute initial commit and create 'master' branch
+     * </pre>
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
-        createGitDirectoriesAndFiles();
+        fileSystem.createGitDirectoriesAndFiles();
         CommitCommand initialCommitCommand = new CommitCommand(fileSystem, "initial commit");
         initialCommitCommand.run();
         String initialCommitHash = initialCommitCommand.getCommitHash();
@@ -26,18 +38,7 @@ public class InitCommand extends Command {
         new CheckoutByBranchCommand(fileSystem, "master").run();
     }
 
-    private void createGitDirectoriesAndFiles() throws IOException {
-        fileSystem.createDirectory(fileSystem.getGitLocation());
-        fileSystem.createDirectory(fileSystem.getLogsLocation());
-        fileSystem.createDirectory(fileSystem.getObjectsLocation());
-        fileSystem.createDirectory(fileSystem.getRefsLocation());
-        fileSystem.createFileOrClearIfExists(fileSystem.getHEADLocation());
-        fileSystem.createFileOrClearIfExists(fileSystem.getIndexLocation());
-    }
-
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {
-
-    }
+    public void checkArgsCorrectness() throws IncorrectArgsException {}
 
 }

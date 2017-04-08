@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
+/** File utils for git (mostly wrappers of java.io/java.nio commands */
 public class FileSystemImpl extends FileSystem {
     public FileSystemImpl(Path workingDirectory) {
         super(workingDirectory);
@@ -110,15 +111,27 @@ public class FileSystemImpl extends FileSystem {
     }
 
     @Override
-    public void copyFile(Path src, Path dest) throws IOException {
-        writeToFile(dest, getFileContentAsByteArray(src));
-    }
-
-    @Override
     public Path buildTreeLocation(String branchName) throws IOException {
         Path refLocation = buildRefLocation(branchName);
         Path commitLocation =  buildObjectLocation(getFileContentAsString(refLocation));
         return buildObjectLocation(getFileContentAsString(commitLocation));
+    }
+
+    @Override
+    public void restoreFile(String pathAsString, String objectHash) throws IOException {
+        Path path = Paths.get(pathAsString);
+        byte[] content = getFileContentAsByteArray(buildObjectLocation(objectHash));
+        writeToFile(path, content);
+    }
+
+    @Override
+    public void createGitDirectoriesAndFiles() throws IOException {
+        createDirectory(getGitLocation());
+        createDirectory(getLogsLocation());
+        createDirectory(getObjectsLocation());
+        createDirectory(getRefsLocation());
+        createFileOrClearIfExists(getHeadLocation());
+        createFileOrClearIfExists(getIndexLocation());
     }
 
 }

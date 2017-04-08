@@ -15,10 +15,6 @@ public class Index {
 
     private final FileSystem fileSystem;
 
-    /**
-     * Create Index instance
-     * @param fileSystem File system
-     */
     public Index(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }

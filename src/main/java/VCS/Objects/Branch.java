@@ -12,11 +12,6 @@ public class Branch {
     private final FileSystem fileSystem;
     private final String branchName;
 
-    /**
-     * Create Branch instance.
-     * @param fileSystem File system
-     * @param branchName Branch name
-     */
     public Branch(FileSystem fileSystem, String branchName) {
         this.fileSystem = fileSystem;
         this.branchName = branchName;

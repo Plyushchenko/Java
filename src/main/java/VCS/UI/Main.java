@@ -20,11 +20,11 @@ public class Main {
                 return;
             }
             Repo repo = new RepoImpl(args, FileSystem.DEFAULT_WORKING_DIRECTORY);
-            repo.execute();
-            System.out.println("response = " + repo.getResponse());
+            String response = repo.execute();
+            System.out.println("response = " + response);
         } catch (Exception e) {
             System.out.println("message = " + e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 }
