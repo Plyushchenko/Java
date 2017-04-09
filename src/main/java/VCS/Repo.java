@@ -3,9 +3,9 @@ package VCS;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /** Git repository */
@@ -13,7 +13,7 @@ public interface Repo {
 
     /** List of possible commands */
     enum RepoCommand {
-        ADD, BRANCH, CHECKOUT, COMMIT, INIT, LOG, MERGE
+        ADD, BRANCH, CHECKOUT, CLEAN, COMMIT, INIT, LOG, MERGE, RESET, RM, STATUS
     }
 
     /**
@@ -24,6 +24,7 @@ public interface Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
+    @NotNull
     String execute() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException;
 
@@ -34,7 +35,8 @@ public interface Repo {
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      */
-    String add(List<String> args) throws IncorrectArgsException, IOException;
+    @NotNull
+    String add(@NotNull List<String> args) throws IncorrectArgsException, IOException;
 
     /**
      * Execute 'git branch ...'.
@@ -45,7 +47,8 @@ public interface Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
-    String branch(List<String> args) throws IncorrectArgsException, IOException,
+    @NotNull
+    String branch(@NotNull List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
     /**
@@ -57,7 +60,8 @@ public interface Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
-    String checkout(List<String> args) throws IncorrectArgsException, IOException,
+    @NotNull
+    String checkout(@NotNull List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
     /**
@@ -68,7 +72,8 @@ public interface Repo {
      * @throws IOException Unknown IO problem
      * @throws UnstagedChangesException Changes were not staged
      */
-    String commit(String message) throws IncorrectArgsException, IOException,
+    @NotNull
+    String commit(@NotNull String message) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
     /**
@@ -79,6 +84,7 @@ public interface Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
+    @NotNull
     String init() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException;
 
@@ -86,6 +92,7 @@ public interface Repo {
      * Execute 'git log'
      * @throws IOException Unknown IO problem
      */
+    @NotNull
     String log() throws IOException;
 
     /**
@@ -97,7 +104,11 @@ public interface Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
-    String merge(String branchName) throws IncorrectArgsException, IOException,
+    @NotNull
+    String merge(@NotNull String branchName) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
+
+    @NotNull
+    String status() throws UncommittedChangesException, IncorrectArgsException, UnstagedChangesException, IOException;
 }

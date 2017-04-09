@@ -11,6 +11,7 @@ import VCS.Data.FileSystemImpl;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,6 +39,7 @@ public class RepoImpl implements Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
+    @NotNull
     @Override
     public String execute() throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
@@ -76,8 +78,9 @@ public class RepoImpl implements Repo {
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      */
+    @NotNull
     @Override
-    public String add(List<String> args) throws IncorrectArgsException, IOException {
+    public String add(@NotNull List<String> args) throws IncorrectArgsException, IOException {
         new AddCommand(fileSystem, args).run();
         return "successful add";
     }
@@ -96,8 +99,9 @@ public class RepoImpl implements Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
+    @NotNull
     @Override
-    public String branch(List<String> args) throws IncorrectArgsException, IOException,
+    public String branch(@NotNull List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
         if (args.size() == 0) {
             BranchListCommand branchListCommand = new BranchListCommand(fileSystem);
@@ -134,8 +138,9 @@ public class RepoImpl implements Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
+    @NotNull
     @Override
-    public String checkout(List<String> args) throws IOException, IncorrectArgsException,
+    public String checkout(@NotNull List<String> args) throws IOException, IncorrectArgsException,
             UnstagedChangesException, UncommittedChangesException {
         if (args.size() == 1) {
             if (parser.isHash(args.get(0))) {
@@ -162,8 +167,9 @@ public class RepoImpl implements Repo {
      * @throws IOException Unknown IO problem
      * @throws UnstagedChangesException Changes were not staged
      */
+    @NotNull
     @Override
-    public String commit(String message) throws IncorrectArgsException, IOException,
+    public String commit(@NotNull String message) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
         CommitCommand commitCommand = new CommitCommand(fileSystem, message);
         commitCommand.run();
@@ -177,6 +183,7 @@ public class RepoImpl implements Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
+    @NotNull
     @Override
     public String init() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
@@ -188,6 +195,7 @@ public class RepoImpl implements Repo {
      * Execute 'git log'
      * @throws IOException Unknown IO problem
      */
+    @NotNull
     @Override
     public String log() throws IOException {
         LogCommand logCommand = new LogCommand(fileSystem);
@@ -204,11 +212,21 @@ public class RepoImpl implements Repo {
      * @throws UnstagedChangesException Changes were not staged
      * @throws UncommittedChangesException Changes were not committed
      */
+    @NotNull
     @Override
-    public String merge(String branchName) throws IncorrectArgsException, UncommittedChangesException,
+    public String merge(@NotNull String branchName) throws IncorrectArgsException, UncommittedChangesException,
             UnstagedChangesException, IOException {
         new MergeCommand(fileSystem, branchName).run();
         return "'" + branchName + "' branch merged into current branch";
+    }
+
+    @NotNull
+    @Override
+    public String status() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        StatusCommand statusCommand = new StatusCommand(fileSystem);
+        statusCommand.run();
+        return statusCommand.getStatus();
     }
 
 }

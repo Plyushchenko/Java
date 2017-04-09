@@ -1,6 +1,7 @@
 package VCS;
 
 import VCS.Exceptions.IncorrectArgsException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,11 +9,12 @@ import java.util.List;
 
 class Parser {
 
-    private final String[] args;
-    Parser(String[] args) {
+    @NotNull private final String[] args;
+    Parser(@NotNull String[] args) {
         this.args = args;
     }
 
+    @NotNull
     String getPrincipleCommandAsString() {
         return args[0];
     }
@@ -63,27 +65,31 @@ class Parser {
         }
     }
 
+    @NotNull
     List<String> extractAddCommandArguments() throws IncorrectArgsException {
         checkAddArgsFormatCorrectness();
         return new ArrayList<>(Arrays.asList(args).subList(1, args.length));
     }
 
+    @NotNull
     String extractCommitCommandArguments() throws IncorrectArgsException {
         checkCommitArgsFormatCorrectness();
         return args[2];
     }
 
+    @NotNull
     List<String> extractBranchCommandArguments() throws IncorrectArgsException {
         checkBranchArgsFormatCorrectness();
         return new ArrayList<>(Arrays.asList(args).subList(1, args.length));
     }
 
+    @NotNull
     List<String> extractCheckoutCommandArguments() throws IncorrectArgsException {
         checkCheckoutArgsFormatCorrectness();
         return new ArrayList<>(Arrays.asList(args).subList(1, args.length));
     }
 
-    boolean isHash(String s) {
+    boolean isHash(@NotNull String s) {
         if (s.length() != 40) {
             return false;
         }
@@ -96,6 +102,7 @@ class Parser {
         return true;
     }
 
+    @NotNull
     String extractMergeCommandArguments() throws IncorrectArgsException {
         checkMergeArgsFormatCorrectness();
         return args[1];

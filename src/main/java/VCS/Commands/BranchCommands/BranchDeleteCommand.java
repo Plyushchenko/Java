@@ -6,15 +6,16 @@ import VCS.Data.FileSystem;
 import VCS.Objects.Head;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Objects.Log;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 /** Branch delete command*/
 public class BranchDeleteCommand extends Command {
 
-    private final Branch branch;
+    @NotNull private final Branch branch;
 
-    public BranchDeleteCommand(FileSystem fileSystem, String branchName) {
+    public BranchDeleteCommand(@NotNull FileSystem fileSystem, @NotNull String branchName) {
         super(fileSystem);
         branch = new Branch(fileSystem, branchName);
     }
@@ -42,7 +43,7 @@ public class BranchDeleteCommand extends Command {
      * @throws IOException Unknown IO problem
      */
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException, IOException {
+    protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (branch.notExists()) {
             throw new IncorrectArgsException("branch doesn't exists");
         }

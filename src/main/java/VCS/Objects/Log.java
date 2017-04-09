@@ -1,18 +1,18 @@
 package VCS.Objects;
 
 import VCS.Data.FileSystem;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-/**
- * Log
- */
+/** Log */
 public class Log {
-    private final FileSystem fileSystem;
-    private final Path logLocation;
 
-    public Log(FileSystem fileSystem, String branchName) {
+    @NotNull private final FileSystem fileSystem;
+    @NotNull private final Path logLocation;
+
+    public Log(@NotNull FileSystem fileSystem, @NotNull String branchName) {
         this.fileSystem = fileSystem;
         logLocation = fileSystem.buildLogLocation(branchName);
     }

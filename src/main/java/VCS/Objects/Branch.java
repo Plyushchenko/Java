@@ -1,6 +1,7 @@
 package VCS.Objects;
 
 import VCS.Data.FileSystem;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -9,10 +10,10 @@ import java.io.IOException;
  */
 public class Branch {
 
-    private final FileSystem fileSystem;
-    private final String branchName;
+    @NotNull private final FileSystem fileSystem;
+    @NotNull private final String branchName;
 
-    public Branch(FileSystem fileSystem, String branchName) {
+    public Branch(@NotNull FileSystem fileSystem, @NotNull String branchName) {
         this.fileSystem = fileSystem;
         this.branchName = branchName;
     }
@@ -22,7 +23,7 @@ public class Branch {
      * @param commitHash Commit hash
      * @throws IOException Unknown IO problem
      */
-    public void updateRef(String commitHash) throws IOException {
+    public void updateRef(@NotNull String commitHash) throws IOException {
         fileSystem.writeToFile(fileSystem.buildRefLocation(branchName), commitHash);
     }
 
@@ -50,10 +51,7 @@ public class Branch {
         return !exists();
     }
 
-    /**
-     * Get branch name
-     * @return Branch name
-     */
+    @NotNull
     public String getBranchName() {
         return branchName;
     }

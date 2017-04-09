@@ -3,14 +3,16 @@ package VCS.Commands;
 import VCS.Data.FileSystem;
 import VCS.Objects.Head;
 import VCS.Objects.Log;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 /** Log command*/
 public class LogCommand extends Command {
 
-	private String log;
-    public LogCommand(FileSystem fileSystem) {
+	@NotNull private String log = "";
+
+    public LogCommand(@NotNull FileSystem fileSystem) {
         super(fileSystem);
     }
 
@@ -26,8 +28,9 @@ public class LogCommand extends Command {
     }
 
     @Override
-    public void checkArgsCorrectness() {}
+    protected void checkArgsCorrectness() {}
 
+    @NotNull
     public String getLog() {
         return log;
     }

@@ -4,6 +4,7 @@ import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -12,8 +13,9 @@ import java.io.IOException;
  */
 public abstract class Command {
 
-    protected final FileSystem fileSystem;
-    protected Command(FileSystem fileSystem) {
+    @NotNull protected final FileSystem fileSystem;
+
+    protected Command(@NotNull FileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
 
@@ -27,5 +29,5 @@ public abstract class Command {
     public abstract void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException;
 
-    public abstract void checkArgsCorrectness() throws IncorrectArgsException, IOException;
+    protected abstract void checkArgsCorrectness() throws IncorrectArgsException, IOException;
 }

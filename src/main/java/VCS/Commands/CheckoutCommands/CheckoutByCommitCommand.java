@@ -9,6 +9,7 @@ import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.Head;
 import VCS.Objects.Log;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,9 +17,10 @@ import java.util.Date;
 
 /** Checkout by commit command */
 public class CheckoutByCommitCommand extends Command {
-    private final String commitHash;
 
-    public CheckoutByCommitCommand(FileSystem fileSystem, String commitHash) {
+    @NotNull private final String commitHash;
+
+    public CheckoutByCommitCommand(@NotNull FileSystem fileSystem, @NotNull String commitHash) {
         super(fileSystem);
         this.commitHash = commitHash;
     }
@@ -51,6 +53,7 @@ public class CheckoutByCommitCommand extends Command {
         new Log(fileSystem, currentBranchName).write(buildCheckoutByCommitInformation());
     }
 
+    @NotNull
     private String buildCheckoutByCommitInformation() {
         return commitHash + " checkout by commit " + new Date(System.currentTimeMillis());
     }
@@ -61,7 +64,7 @@ public class CheckoutByCommitCommand extends Command {
      * @throws IOException Unknown IO problem
      */
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException, IOException {
+    protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (fileSystem.notExists(fileSystem.buildObjectLocation(commitHash))) {
             throw new IncorrectArgsException("commit doesn't exist");
         }

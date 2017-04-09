@@ -9,6 +9,7 @@ import VCS.Objects.*;
 import VCS.Objects.GitObjects.Blob;
 import VCS.Objects.GitObjects.Commit;
 import VCS.Objects.GitObjects.Tree;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -16,10 +17,11 @@ import java.util.List;
 
 /** Commit command*/
 public class CommitCommand extends Command {
-    private final String message;
-    private String commitHash;
 
-    public CommitCommand(FileSystem fileSystem, String message) {
+    @NotNull private final String message;
+    @NotNull private String commitHash = "";
+
+    public CommitCommand(@NotNull FileSystem fileSystem, @NotNull String message) {
         super(fileSystem);
         this.message = message;
     }
@@ -64,8 +66,9 @@ public class CommitCommand extends Command {
     }
 
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {}
+    protected void checkArgsCorrectness() throws IncorrectArgsException {}
 
+    @NotNull
     public String getCommitHash() {
         return commitHash;
     }

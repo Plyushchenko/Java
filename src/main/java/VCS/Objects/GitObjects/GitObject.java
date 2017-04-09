@@ -1,26 +1,23 @@
 package VCS.Objects.GitObjects;
 
 import VCS.Data.FileSystem;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * Git object
- */
+/** Classic git object */
 public abstract class GitObject {
 
-    private static final int HASH_LENGTH = 40;
-    private final FileSystem fileSystem;
-    private final String hash;
-    private final String type;
+    @NotNull private final FileSystem fileSystem;
+    @NotNull private final String hash;
+    @NotNull private final String type;
     private final int size;
-    private final byte[] content;
+    @NotNull private final byte[] content;
 
-    GitObject(FileSystem fileSystem, String hash, String type, int size, byte[] content) {
+    GitObject(@NotNull FileSystem fileSystem, @NotNull String hash, @NotNull String type, int size,
+              @NotNull byte[] content) {
         this.fileSystem = fileSystem;
         this.hash = hash;
         this.type = type;
@@ -28,30 +25,21 @@ public abstract class GitObject {
         this.content = content;
     }
 
-    /**
-     * Get SHA1 hash
-     * @return SHA1 hash
-     */
+    @NotNull
     public String getHash() {
         return hash;
     }
 
-    /**
-     * Get type of Git object (i.e. blob/commit/tree)
-     * @return type of Git object
-     */
+    @NotNull
     public String getType() {
         return type;
     }
 
-    /**
-     * Get size of Git objects in bytes
-     * @return size of Git object
-     */
     public int getSize() {
         return size;
     }
 
+    @NotNull
     private byte[] getContent() {
         return content;
     }
@@ -61,11 +49,11 @@ public abstract class GitObject {
      * @throws IOException Unknown IO problem
      */
     public void addObject() throws IOException {
-        fileSystem.writeToFile(Paths.get(
-                fileSystem.getObjectsLocation() + File.separator + getHash()), getContent());
+        fileSystem.writeToFile(fileSystem.buildObjectLocation(getHash()), getContent());
     }
 
-    static String buildHash(byte[] content) {
+    @NotNull
+    static String buildHash(@NotNull byte[] content) {
         MessageDigest digest = null;
         try {
             digest = MessageDigest.getInstance("SHA-1");

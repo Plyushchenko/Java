@@ -4,6 +4,7 @@ import VCS.Commands.Command;
 import VCS.Data.FileSystem;
 import VCS.Objects.Head;
 import VCS.Exceptions.IncorrectArgsException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,9 +12,9 @@ import java.util.List;
 /** Branch list command*/
 public class BranchListCommand extends Command {
 
-    private String branchListAsString;
+    @NotNull private String branchListAsString = "";
 
-    public BranchListCommand(FileSystem fileSystem) {
+    public BranchListCommand(@NotNull FileSystem fileSystem) {
         super(fileSystem);
     }
 
@@ -49,8 +50,9 @@ public class BranchListCommand extends Command {
     }
 
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {}
+    protected void checkArgsCorrectness() throws IncorrectArgsException {}
 
+    @NotNull
     public String getBranchList() {
         return branchListAsString;
     }

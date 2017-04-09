@@ -6,13 +6,14 @@ import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 /** Init command */
 public class InitCommand extends Command {
 
-    public InitCommand(FileSystem fileSystem) {
+    public InitCommand(@NotNull FileSystem fileSystem) {
         super(fileSystem);
     }
 
@@ -39,6 +40,6 @@ public class InitCommand extends Command {
     }
 
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {}
+    protected void checkArgsCorrectness() throws IncorrectArgsException {}
 
 }

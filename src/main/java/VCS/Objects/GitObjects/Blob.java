@@ -1,17 +1,16 @@
 package VCS.Objects.GitObjects;
 
 import VCS.Data.FileSystem;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Blob
- */
+/** Blob */
 public class Blob extends GitObject {
 
-    private Blob(FileSystem fileSystem, byte[] content) {
+    private Blob(@NotNull FileSystem fileSystem, @NotNull byte[] content) {
         super(fileSystem, buildHash(content), "blob", content.length, content);
     }
 
@@ -22,7 +21,9 @@ public class Blob extends GitObject {
      * @return Blob which hash if the hash of the passed file
      * @throws IOException Unknown IO problem
      */
-    public static Blob buildBlob(FileSystem fileSystem, Path path) throws IOException {
+    @NotNull
+    public static Blob buildBlob(@NotNull FileSystem fileSystem, @NotNull Path path)
+            throws IOException {
         return new Blob(fileSystem, Files.readAllBytes(path));
     }
 

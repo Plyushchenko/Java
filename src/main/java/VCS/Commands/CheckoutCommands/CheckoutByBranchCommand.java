@@ -8,18 +8,20 @@ import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.Head;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 /** Checkout by branch command */
 public class CheckoutByBranchCommand extends Command {
-    private final Branch branch;
-    private final Head repoHead;
 
-    public CheckoutByBranchCommand(FileSystem fileSystem, String branchName) {
+    @NotNull private final String branchName;
+    @NotNull private final Head repoHead;
+
+    public CheckoutByBranchCommand(@NotNull FileSystem fileSystem, @NotNull String branchName) {
         super(fileSystem);
-        branch = new Branch(fileSystem, branchName);
+        this.branchName = branchName;
         repoHead = new Head(fileSystem);
     }
 
@@ -41,10 +43,10 @@ public class CheckoutByBranchCommand extends Command {
             UncommittedChangesException {
         checkArgsCorrectness();
         new CheckFilesStateCommand(fileSystem).run();
-        Path treeLocation = fileSystem.buildTreeLocation(branch.getBranchName());
+        Path treeLocation = fileSystem.buildTreeLocation(branchName);
         fileSystem.restoreFiles(fileSystem.splitLines(treeLocation));
         fileSystem.copyFile(treeLocation, fileSystem.getIndexLocation());
-        repoHead.updateHead(branch.getBranchName());
+        repoHead.updateHead(branchName);
     }
 
     /**
@@ -53,11 +55,11 @@ public class CheckoutByBranchCommand extends Command {
      * @throws IOException Unknown IO problem
      */
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException, IOException {
-        if (repoHead.getCurrentBranchName().equals(branch.getBranchName())) {
+    protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
+        if (repoHead.getCurrentBranchName().equals(branchName)) {
             throw new IncorrectArgsException("this is current branch");
         }
-        if (new Branch(fileSystem, branch.getBranchName()).notExists()) {
+        if (new Branch(fileSystem, branchName).notExists()) {
             throw new IncorrectArgsException("branch doesn't exists");
         }
     }

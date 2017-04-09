@@ -1,6 +1,7 @@
 package VCS.Data;
 
 import javafx.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,49 +16,22 @@ public abstract class FileSystem {
 
     public static final Path DEFAULT_WORKING_DIRECTORY = Paths.get(System.getProperty("user.dir"));
 
-    public Path getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    public Path getGitLocation() {
-        return gitLocation;
-    }
-
-    public Path getIndexLocation() {
-        return indexLocation;
-    }
-
-    public Path getRefsLocation() {
-        return refsLocation;
-    }
-
-    public Path getHeadLocation() {
-        return headLocation;
-    }
-
-    public Path getObjectsLocation() {
-        return objectsLocation;
-    }
-
-    public Path getLogsLocation() {
-        return logsLocation;
-    }
-
     private boolean gitExists = true;
-    final Path workingDirectory;
-    private final Path gitLocation;
-    private final Path indexLocation;
-    final Path refsLocation;
-    private final Path headLocation;
-    final Path objectsLocation;
-    final Path logsLocation;
+    @NotNull final Path workingDirectory;
+    @NotNull private final Path gitLocation;
+    @NotNull private final Path indexLocation;
+    @NotNull final Path refsLocation;
+    @NotNull private final Path headLocation;
+    @NotNull final Path objectsLocation;
+    @NotNull final Path logsLocation;
 
-    public FileSystem(Path workingDirectory) {
+    public FileSystem(@NotNull Path workingDirectory) {
         this.workingDirectory = workingDirectory;
         Path tmp = Paths.get(workingDirectory + File.separator + ".mygit");
         while (Files.notExists(tmp)) {
             tmp = tmp.getParent().getParent();
             if (tmp == null){
+                tmp = Paths.get("");
                 gitExists = false;
                 break;
             }
@@ -72,6 +46,43 @@ public abstract class FileSystem {
         logsLocation = Paths.get(gitLocation + File.separator + "logs");
     }
 
+    /*
+    @NotNull
+    public Path getWorkingDirectory() {
+        return workingDirectory;
+    }
+    */
+
+    @NotNull
+    public Path getGitLocation() {
+        return gitLocation;
+    }
+
+    @NotNull
+    public Path getIndexLocation() {
+        return indexLocation;
+    }
+
+    @NotNull
+    public Path getRefsLocation() {
+        return refsLocation;
+    }
+
+    @NotNull
+    public Path getHeadLocation() {
+        return headLocation;
+    }
+
+    @NotNull
+    public Path getObjectsLocation() {
+        return objectsLocation;
+    }
+
+    @NotNull
+    Path getLogsLocation() {
+        return logsLocation;
+    }
+
     public boolean gitExists() {
         return gitExists;
     }
@@ -80,39 +91,46 @@ public abstract class FileSystem {
         return !gitExists;
     }
 
-    public abstract void createDirectory(Path path) throws IOException;
+    public abstract void createDirectory(@NotNull Path path) throws IOException;
 
-    public abstract void createFileOrClearIfExists(Path path) throws IOException;
+    public abstract void createFileOrClearIfExists(@NotNull Path path) throws IOException;
 
-    void createFileIfNotExists(Path path) throws IOException {
+    void createFileIfNotExists(@NotNull Path path) throws IOException {
         if (Files.notExists(path)) {
             createFileOrClearIfExists(path);
         }
     }
 
-    public abstract void appendToFile(Path path, String message) throws IOException;
+    public abstract void appendToFile(@NotNull Path path, @NotNull String s) throws IOException;
 
-    public abstract Path buildRefLocation(String branchName);
+    @NotNull
+    public abstract Path buildRefLocation(@NotNull String s);
 
-    public abstract Path buildLogLocation(String branchName);
+    @NotNull
+    public abstract Path buildLogLocation(@NotNull String s);
 
-    public abstract Path buildObjectLocation(String objectHash);
+    @NotNull
+    public abstract Path buildObjectLocation(@NotNull String objectHash);
 
-    public abstract void writeToFile(Path path, byte[] content) throws IOException;
+    public abstract void writeToFile(@NotNull Path path, @NotNull byte[] content)
+            throws IOException;
 
-    public abstract void writeToFile(Path path, String message) throws IOException;
+    public abstract void writeToFile(@NotNull Path path, @NotNull String s) throws IOException;
 
-    public abstract void writeToFile(Path path, List<String> content) throws IOException;
+    public abstract void writeToFile(@NotNull Path path, @NotNull List<String> content)
+            throws IOException;
 
-    public abstract boolean exists(Path path);
+    public abstract boolean exists(@NotNull Path path);
 
-    public boolean notExists(Path path) {
+    public boolean notExists(@NotNull Path path) {
         return !exists(path);
     }
 
-    public abstract List<String> getFileContentLineByLine(Path path) throws IOException;
+    @NotNull
+    public abstract List<String> getFileContentLineByLine(@NotNull Path path) throws IOException;
 
-    public Pair<List<String>, List<String>> splitLines(Path path) throws IOException {
+    @NotNull
+    public Pair<List<String>, List<String>> splitLines(@NotNull Path path) throws IOException {
         List<String> content = getFileContentLineByLine(path);
         List<String> l = new ArrayList<>();
         List<String> r = new ArrayList<>();
@@ -123,7 +141,8 @@ public abstract class FileSystem {
         return new Pair<>(l, r);
     }
 
-    public List<String> zipLines(Pair<List<String>, List<String>> content)
+    @NotNull
+    public List<String> zipLines(@NotNull Pair<List<String>, List<String>> content)
             throws IOException {
         List<String> res = new ArrayList<>();
         for (int i = 0; i < content.getKey().size(); i++) {
@@ -133,9 +152,11 @@ public abstract class FileSystem {
         return res;
     }
 
-    public abstract Path toAbsolute(Path path);
+    @NotNull
+    public abstract Path toAbsolute(@NotNull Path path);
 
-    public String getFileContentAsString(Path path) throws IOException {
+    @NotNull
+    public String getFileContentAsString(@NotNull Path path) throws IOException {
         List<String> lines = getFileContentLineByLine(path);
         String res = "";
         for (int i = 0; i < lines.size(); i++) {
@@ -147,9 +168,10 @@ public abstract class FileSystem {
         return res;
     }
 
-    public abstract void deleteFile(Path path) throws IOException;
+    public abstract void deleteFile(@NotNull Path path) throws IOException;
 
-    public List<String> getFolderContent(Path path) throws IOException {
+    @NotNull
+    public List<String> getFolderContent(@NotNull Path path) throws IOException {
         List <String> res = new ArrayList<>();
         File[] files = path.toFile().listFiles();
         if (files != null) {
@@ -160,17 +182,20 @@ public abstract class FileSystem {
         return res;
     }
 
-    public abstract void restoreFiles(Pair<List<String>, List<String>> content) throws IOException;
+    public abstract void restoreFiles(@NotNull Pair<List<String>, List<String>> content)
+            throws IOException;
 
-    public abstract byte[] getFileContentAsByteArray(Path path) throws IOException;
+    public abstract byte[] getFileContentAsByteArray(@NotNull Path path) throws IOException;
 
-    public void copyFile(Path src, Path dest) throws IOException {
+    public void copyFile(@NotNull Path src, @NotNull Path dest) throws IOException {
         writeToFile(dest, getFileContentAsByteArray(src));
     }
 
-    public abstract Path buildTreeLocation(String branchName) throws IOException;
+    @NotNull
+    public abstract Path buildTreeLocation(@NotNull String branchName) throws IOException;
 
-    public abstract void restoreFile(String pathAsString, String objectHash) throws IOException;
+    public abstract void restoreFile(@NotNull String pathAsString, @NotNull String objectHash)
+            throws IOException;
 
     public abstract void createGitDirectoriesAndFiles() throws IOException;
 }

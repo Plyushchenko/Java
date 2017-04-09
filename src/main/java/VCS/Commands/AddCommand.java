@@ -3,6 +3,7 @@ package VCS.Commands;
 import VCS.Data.FileSystem;
 import VCS.Objects.Index;
 import VCS.Exceptions.IncorrectArgsException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -11,9 +12,9 @@ import java.util.List;
 /** Add command */
 public class AddCommand extends Command {
 
-    private final List<String> filePaths;
+    @NotNull private final List<String> filePaths;
 
-    public AddCommand(FileSystem fileSystem, List<String> filePaths) {
+    public AddCommand(@NotNull FileSystem fileSystem, @NotNull List<String> filePaths) {
         super(fileSystem);
         this.filePaths = filePaths;
     }
@@ -36,7 +37,7 @@ public class AddCommand extends Command {
      * @throws IncorrectArgsException Incorrect args passed
      */
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {
+    protected void checkArgsCorrectness() throws IncorrectArgsException {
         for (String s : filePaths) {
             if (fileSystem.notExists(Paths.get(s))) {
                 throw new IncorrectArgsException("file doesn't exist: " + s);

@@ -7,6 +7,7 @@ import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.GitObjects.Blob;
 import VCS.Objects.Head;
 import javafx.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -15,7 +16,7 @@ import java.util.List;
 /** File state checker */
 public class CheckFilesStateCommand extends Command {
 
-    public CheckFilesStateCommand(FileSystem fileSystem) {
+    public CheckFilesStateCommand(@NotNull FileSystem fileSystem) {
         super(fileSystem);
     }
 
@@ -36,7 +37,8 @@ public class CheckFilesStateCommand extends Command {
         checkForUncommittedFiles();
     }
 
-    void runWithContent(List<String> filesToCommit, List<String> hashesOfFilesToCommit)
+    void runWithContent(@NotNull List<String> filesToCommit,
+                        @NotNull List<String> hashesOfFilesToCommit)
             throws IOException, UnstagedChangesException {
         checkForUnstagedFiles(filesToCommit, hashesOfFilesToCommit);
     }
@@ -47,7 +49,7 @@ public class CheckFilesStateCommand extends Command {
     }
 
     private void checkForUnstagedFiles(
-            List<String> filesToCommit, List<String> hashesOfFilesToCommit) throws
+            @NotNull List<String> filesToCommit, @NotNull List<String> hashesOfFilesToCommit) throws
             IOException, UnstagedChangesException {
         String unstagedFiles = "";
         for (int i = 0; i < filesToCommit.size(); i++) {
@@ -85,5 +87,5 @@ public class CheckFilesStateCommand extends Command {
     }
 
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException, IOException {}
+    protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {}
 }

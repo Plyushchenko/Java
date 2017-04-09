@@ -2,7 +2,6 @@ package VCS.Commands.BranchCommands;
 
 import VCS.Commands.CheckFilesStateCommand;
 import VCS.Commands.Command;
-import VCS.Commands.CommitCommand;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
@@ -10,16 +9,18 @@ import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.Head;
 import VCS.Objects.Log;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Date;
 
 /** Branch create command */
 public class BranchCreateCommand extends Command {
-    private final Head repoHead;
-    private final Branch branch;
 
-    public BranchCreateCommand(FileSystem fileSystem, String branchName) {
+    @NotNull private final Head repoHead;
+    @NotNull private final Branch branch;
+
+    public BranchCreateCommand(@NotNull FileSystem fileSystem, @NotNull String branchName) {
         super(fileSystem);
         branch = new Branch(fileSystem, branchName);
         repoHead = new Head(fileSystem);
@@ -53,7 +54,7 @@ public class BranchCreateCommand extends Command {
      * @param initialCommitHash Hash of initial commit
      * @throws IOException Unknown IO problem
      */
-    public void runMaster(String initialCommitHash) throws IOException {
+    public void runMaster(@NotNull String initialCommitHash) throws IOException {
         new Log(fileSystem, repoHead.getCurrentBranchName()).write(
                 buildCreateInformation(initialCommitHash));
         branch.updateRef(initialCommitHash);
@@ -64,13 +65,14 @@ public class BranchCreateCommand extends Command {
      * @throws IncorrectArgsException Incorrect args passed
      */
     @Override
-    public void checkArgsCorrectness() throws IncorrectArgsException {
+    protected void checkArgsCorrectness() throws IncorrectArgsException {
         if (branch.exists()) {
             throw new IncorrectArgsException("branch already exists");
         }
     }
 
-    private String buildCreateInformation(String commitHash) throws IOException {
+    @NotNull
+    private String buildCreateInformation(@NotNull String commitHash) throws IOException {
         String currentBranchName = new Head(fileSystem).getCurrentBranchName();
         if (currentBranchName.equals("")) {
             currentBranchName = "new repo";

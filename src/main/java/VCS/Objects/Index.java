@@ -3,6 +3,7 @@ package VCS.Objects;
 import javafx.util.Pair;
 import VCS.Data.FileSystem;
 import VCS.Objects.GitObjects.Blob;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -13,9 +14,9 @@ import java.util.List;
  */
 public class Index {
 
-    private final FileSystem fileSystem;
+    @NotNull private final FileSystem fileSystem;
 
-    public Index(FileSystem fileSystem) {
+    public Index(@NotNull FileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
 
@@ -31,7 +32,7 @@ public class Index {
      * @param filePaths Paths of files
      * @throws IOException Unknown IO problem
      */
-    public void updateContent(List<String> filePaths) throws IOException {
+    public void updateContent(@NotNull List<String> filePaths) throws IOException {
         Pair<List<String>, List<String>> content = fileSystem.splitLines(
                 fileSystem.getIndexLocation());
         List<String> indexedFiles = content.getKey();

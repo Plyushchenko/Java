@@ -1,6 +1,7 @@
 package VCS.Data;
 
 import javafx.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,46 +14,48 @@ import java.util.List;
 
 /** File utils for git (mostly wrappers of java.io/java.nio commands */
 public class FileSystemImpl extends FileSystem {
-    public FileSystemImpl(Path workingDirectory) {
+
+    public FileSystemImpl(@NotNull Path workingDirectory) {
         super(workingDirectory);
     }
 
     @Override
-    public void createDirectory(Path path) throws IOException {
+    public void createDirectory(@NotNull Path path) throws IOException {
         Files.createDirectories(path);
     }
 
     @Override
-    public void createFileOrClearIfExists(Path path) throws IOException {
+    public void createFileOrClearIfExists(@NotNull Path path) throws IOException {
         createDirectory(path.getParent());
         Files.deleteIfExists(path);
         Files.createFile(path);
     }
 
     @Override
-    public void appendToFile(Path path, String message) throws IOException {
+    public void appendToFile(@NotNull Path path, @NotNull String message) throws IOException {
         createFileIfNotExists(path);
         Files.write(path, message.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
     }
 
+    @NotNull
     @Override
-    public Path buildRefLocation(String branchName) {
+    public Path buildRefLocation(@NotNull String branchName) {
         return Paths.get(refsLocation + File.separator + branchName);
     }
 
     @Override
-    public void writeToFile(Path path, byte[] message) throws IOException {
+    public void writeToFile(@NotNull Path path, @NotNull byte[] message) throws IOException {
         createFileOrClearIfExists(path);
         Files.write(path, message);
     }
 
     @Override
-    public void writeToFile(Path path, String message) throws IOException {
+    public void writeToFile(@NotNull Path path, @NotNull String message) throws IOException {
         writeToFile(path, message.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
-    public void writeToFile(Path path, List<String> content) throws IOException {
+    public void writeToFile(@NotNull Path path, @NotNull List<String> content) throws IOException {
         createFileOrClearIfExists(path);
         for (int i = 0; i < content.size(); i++) {
             appendToFile(path, content.get(i));
@@ -62,28 +65,32 @@ public class FileSystemImpl extends FileSystem {
         }
     }
 
+    @NotNull
     @Override
-    public Path buildLogLocation(String branchName) {
+    public Path buildLogLocation(@NotNull String branchName) {
         return Paths.get(logsLocation + File.separator + branchName);
     }
 
+    @NotNull
     @Override
-    public Path buildObjectLocation(String objectHash) {
+    public Path buildObjectLocation(@NotNull String objectHash) {
         return Paths.get(objectsLocation + File.separator + objectHash);
     }
 
     @Override
-    public boolean exists(Path path) {
+    public boolean exists(@NotNull Path path) {
         return Files.exists(path);
     }
 
+    @NotNull
     @Override
-    public List<String> getFileContentLineByLine(Path path) throws IOException {
+    public List<String> getFileContentLineByLine(@NotNull Path path) throws IOException {
         return Files.readAllLines(path);
     }
 
+    @NotNull
     @Override
-    public Path toAbsolute(Path path) {
+    public Path toAbsolute(@NotNull Path path) {
         if (path.isAbsolute()) {
             return path;
         }
@@ -91,12 +98,12 @@ public class FileSystemImpl extends FileSystem {
     }
 
     @Override
-    public void deleteFile(Path path) throws IOException {
+    public void deleteFile(@NotNull Path path) throws IOException {
         Files.deleteIfExists(path);
     }
 
     @Override
-    public void restoreFiles(Pair<List<String>, List<String>> content) throws IOException {
+    public void restoreFiles(@NotNull Pair<List<String>, List<String>> content) throws IOException {
         List<String> filePaths = content.getKey();
         List<String> fileHashes = content.getValue();
         for (int i = 0; i < filePaths.size(); i++) {
@@ -106,19 +113,21 @@ public class FileSystemImpl extends FileSystem {
     }
 
     @Override
-    public byte[] getFileContentAsByteArray(Path path) throws IOException {
+    public byte[] getFileContentAsByteArray(@NotNull Path path) throws IOException {
         return Files.readAllBytes(path);
     }
 
+    @NotNull
     @Override
-    public Path buildTreeLocation(String branchName) throws IOException {
+    public Path buildTreeLocation(@NotNull String branchName) throws IOException {
         Path refLocation = buildRefLocation(branchName);
         Path commitLocation =  buildObjectLocation(getFileContentAsString(refLocation));
         return buildObjectLocation(getFileContentAsString(commitLocation));
     }
 
     @Override
-    public void restoreFile(String pathAsString, String objectHash) throws IOException {
+    public void restoreFile(@NotNull String pathAsString, @NotNull String objectHash)
+            throws IOException {
         Path path = Paths.get(pathAsString);
         byte[] content = getFileContentAsByteArray(buildObjectLocation(objectHash));
         writeToFile(path, content);

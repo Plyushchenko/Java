@@ -1,16 +1,16 @@
 package VCS.Objects;
 
 import VCS.Data.FileSystem;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-/**
- * Head
- */
+/** Head */
 public class Head {
-    private final FileSystem fileSystem;
 
-    public Head(FileSystem fileSystem) {
+    @NotNull private final FileSystem fileSystem;
+
+    public Head(@NotNull FileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
 
@@ -19,6 +19,7 @@ public class Head {
      * @return Current branch name
      * @throws IOException Unknown IO problems
      */
+    @NotNull
     public String getCurrentBranchName() throws IOException {
         return fileSystem.getFileContentAsString(fileSystem.getHeadLocation());
     }
@@ -28,13 +29,14 @@ public class Head {
      * @return Current commit hash of current branch
      * @throws IOException Unknown IO problems
      */
+    @NotNull
     public String getHeadCommitHash() throws IOException {
         String currentBranchName = getCurrentBranchName();
         return fileSystem.getFileContentAsString(fileSystem.buildRefLocation(currentBranchName));
     }
 
     /**
-     * Update Head
+     * Update HEAD with branchName
      * @param branchName Branch name
      * @throws IOException Unknown IO problems
      */
