@@ -6,6 +6,7 @@ import VCS.Exceptions.UnstagedChangesException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 /** Git repository */
@@ -64,6 +65,9 @@ public interface Repo {
     String checkout(@NotNull List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
+    @NotNull
+    String clean() throws UncommittedChangesException, IncorrectArgsException, UnstagedChangesException, IOException;
+
     /**
      * Execute 'git commit ...'
      * @param message -m, commit message
@@ -108,6 +112,14 @@ public interface Repo {
     String merge(@NotNull String branchName) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
+
+    @NotNull
+    String reset(@NotNull String fileToReset) throws UncommittedChangesException,
+            IncorrectArgsException, UnstagedChangesException, IOException;
+
+    @NotNull
+    String rm(@NotNull String fileToRm) throws IncorrectArgsException, IOException,
+            UnstagedChangesException, UncommittedChangesException;
 
     @NotNull
     String status() throws UncommittedChangesException, IncorrectArgsException,

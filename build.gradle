@@ -4,11 +4,8 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 jar {
-    manifest {
-        def manif = "${projectDir}/src/main/resources/META-INF/MANIFEST.MF"
-        from file(manif)
-    }
-    baseName = "git"
+    from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it)} }
+    manifest { attributes 'Main-Class': 'VCS.UI.Main' }
 }
 
 repositories {
@@ -17,6 +14,6 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile group: 'commons-io', name: 'commons-io', version: '2.0.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.0.1'
     compile group: 'org.jetbrains', name: 'annotations', version: '13.0'
 }

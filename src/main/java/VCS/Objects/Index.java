@@ -53,4 +53,9 @@ public class Index {
         fileSystem.writeToFile(fileSystem.getIndexLocation(), fileSystem.zipLines(content));
     }
 
+    public void setContent(@NotNull List<String> filePaths, @NotNull List<String> fileHashes)
+            throws IOException {
+        fileSystem.writeToFile(fileSystem.getIndexLocation(),
+                fileSystem.zipLines(new Pair<>(filePaths, fileHashes)));
+    }
 }

@@ -1,6 +1,7 @@
 package VCS.Data;
 
 import javafx.util.Pair;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /** File utils for git*/
 public abstract class FileSystem {
@@ -64,6 +66,9 @@ public abstract class FileSystem {
         return gitLocation;
     }
 
+    @NotNull public Path getFolderWithGitLocation() {
+        return gitLocation.getParent();
+    }
     @NotNull
     public Path getIndexLocation() {
         return indexLocation;
@@ -177,15 +182,11 @@ public abstract class FileSystem {
     public abstract void deleteFile(@NotNull Path path) throws IOException;
 
     @NotNull
-    public List<String> getFolderContent(@NotNull Path path) throws IOException {
-        List <String> res = new ArrayList<>();
-        File[] files = path.toFile().listFiles();
-        if (files != null) {
-            for (File file : files) {
-                res.add(file.getName());
-            }
-        }
-        return res;
+    public List<Path> getFolderContent(@NotNull Path path) throws IOException {
+        return FileUtils.listFiles(path.toFile(), null, true)
+                .stream()
+                .map(File::toPath)
+                .collect(Collectors.toList());
     }
 
     public abstract void restoreFiles(@NotNull Pair<List<String>, List<String>> content)

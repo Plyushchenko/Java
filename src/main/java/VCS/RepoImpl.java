@@ -69,6 +69,13 @@ public class RepoImpl implements Repo {
                 return log();
             case MERGE:
                 return merge(parser.extractMergeCommandArguments());
+            case RESET:
+                return reset(parser.extractResetCommandArguments());
+            case RM:
+                return rm(parser.extractRmCommandArguments());
+            case STATUS:
+                parser.checkStatusArgsFormatCorrectness();
+                return status();
             default:
                 throw new IncorrectArgsException("No such command");
         }
@@ -161,6 +168,13 @@ public class RepoImpl implements Repo {
         }
     }
 
+    @NotNull
+    @Override
+    public String clean() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        new CleanCommand(fileSystem).run();
+        return "cleaned";
+    }
     /**
      * Execute 'git commit ...'
      * @param message -m, commit message
@@ -216,10 +230,26 @@ public class RepoImpl implements Repo {
      */
     @NotNull
     @Override
-    public String merge(@NotNull String branchName) throws IncorrectArgsException, UncommittedChangesException,
-            UnstagedChangesException, IOException {
+    public String merge(@NotNull String branchName) throws IncorrectArgsException, IOException,
+            UnstagedChangesException, UncommittedChangesException {
         new MergeCommand(fileSystem, branchName).run();
         return "'" + branchName + "' branch merged into current branch";
+    }
+
+    @NotNull
+    @Override
+    public String reset(@NotNull String fileToReset) throws IncorrectArgsException, IOException,
+            UnstagedChangesException, UncommittedChangesException {
+        new ResetCommand(fileSystem, fileToReset).run();
+        return "reset file: " + fileToReset;
+    }
+
+    @NotNull
+    @Override
+    public String rm(@NotNull String fileToRm) throws IncorrectArgsException, IOException,
+            UnstagedChangesException, UncommittedChangesException {
+        new RmCommand(fileSystem, fileToRm).run();
+        return "rm file: " + fileToRm;
     }
 
     @NotNull

@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class CleanCommand extends Command{
 
-    protected CleanCommand(@NotNull FileSystem fileSystem) {
+    public CleanCommand(@NotNull FileSystem fileSystem) {
         super(fileSystem);
     }
 

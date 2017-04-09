@@ -3,6 +3,7 @@ package VCS;
 import VCS.Exceptions.IncorrectArgsException;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,6 +66,12 @@ class Parser {
         }
     }
 
+    void checkStatusArgsFormatCorrectness() throws IncorrectArgsException {
+        if (args.length != 1) {
+            throw new IncorrectArgsException("format: git status");
+        }
+    }
+
     @NotNull
     List<String> extractAddCommandArguments() throws IncorrectArgsException {
         checkAddArgsFormatCorrectness();
@@ -106,5 +113,29 @@ class Parser {
     String extractMergeCommandArguments() throws IncorrectArgsException {
         checkMergeArgsFormatCorrectness();
         return args[1];
+    }
+
+    @NotNull
+    String extractResetCommandArguments() throws IncorrectArgsException {
+        checkResetArgsFormatCorrectness();
+        return args[1];
+    }
+
+    private void checkResetArgsFormatCorrectness() throws IncorrectArgsException {
+        if (args.length != 2) {
+            throw new IncorrectArgsException("format: git reset file");
+        }
+    }
+
+    @NotNull
+    String extractRmCommandArguments() throws IncorrectArgsException {
+        checkRmArgsFormatCorrectness();
+        return args[1];
+    }
+
+    private void checkRmArgsFormatCorrectness() throws IncorrectArgsException {
+        if (args.length != 2) {
+            throw new IncorrectArgsException("format: git rm file");
+        }
     }
 }

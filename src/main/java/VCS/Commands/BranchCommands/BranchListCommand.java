@@ -7,6 +7,7 @@ import VCS.Exceptions.IncorrectArgsException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 /** Branch list command*/
@@ -34,15 +35,16 @@ public class BranchListCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException {
         String currentBranchName = new Head(fileSystem).getCurrentBranchName();
-        List<String> refs = fileSystem.getFolderContent(fileSystem.getRefsLocation());
+        List<Path> refs = fileSystem.getFolderContent(fileSystem.getRefsLocation());
         branchListAsString = "";
         for (int i = 0; i < refs.size(); i++) {
-            if (refs.get(i).equals(currentBranchName)) {
+            String branchName = refs.get(i).getFileName().toString();
+            if (branchName.equals(currentBranchName)) {
                 branchListAsString += " *";
             } else {
                 branchListAsString += "  ";
             }
-            branchListAsString += refs.get(i);
+            branchListAsString += branchName;
             if (i + 1 != refs.size()) {
                 branchListAsString += "\n";
             }
