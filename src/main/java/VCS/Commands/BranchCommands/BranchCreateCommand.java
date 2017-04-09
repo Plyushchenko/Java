@@ -55,7 +55,7 @@ public class BranchCreateCommand extends Command {
      * @throws IOException Unknown IO problem
      */
     public void runMaster(@NotNull String initialCommitHash) throws IOException {
-        new Log(fileSystem, repoHead.getCurrentBranchName()).write(
+        new Log(fileSystem, "master").write(
                 buildCreateInformation(initialCommitHash));
         branch.updateRef(initialCommitHash);
     }

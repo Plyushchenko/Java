@@ -26,17 +26,23 @@ public abstract class FileSystem {
     @NotNull final Path logsLocation;
 
     public FileSystem(@NotNull Path workingDirectory) {
+        this(workingDirectory, false);
+    }
+
+    public FileSystem(@NotNull Path workingDirectory, boolean isInit) {
         this.workingDirectory = workingDirectory;
         Path tmp = Paths.get(workingDirectory + File.separator + ".mygit");
-        while (Files.notExists(tmp)) {
-            tmp = tmp.getParent().getParent();
-            if (tmp == null){
-                tmp = Paths.get("");
-                gitExists = false;
-                break;
+        if (!isInit) {
+            while (Files.notExists(tmp)) {
+                tmp = tmp.getParent().getParent();
+                if (tmp == null) {
+                    tmp = Paths.get("");
+                    gitExists = false;
+                    break;
+                }
+                tmp = Paths.get(tmp + File.separator + ".mygit");
+                System.out.println(tmp);
             }
-            tmp = Paths.get(tmp + File.separator + ".mygit");
-            System.out.println(tmp);
         }
         gitLocation = tmp;
         indexLocation = Paths.get(gitLocation + File.separator + "index");

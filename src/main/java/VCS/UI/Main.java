@@ -24,7 +24,7 @@ public class Main {
             System.out.println("response = " + response);
         } catch (Exception e) {
             System.out.println("message = " + e.getMessage());
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }

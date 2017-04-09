@@ -19,6 +19,10 @@ public class FileSystemImpl extends FileSystem {
         super(workingDirectory);
     }
 
+    public FileSystemImpl(@NotNull Path workingDirectory, boolean isInit) {
+        super(workingDirectory, isInit);
+    }
+
     @Override
     public void createDirectory(@NotNull Path path) throws IOException {
         Files.createDirectories(path);

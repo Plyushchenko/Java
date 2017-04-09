@@ -23,11 +23,13 @@ import static VCS.Repo.RepoCommand.*;
 /** Repo implementation */
 public class RepoImpl implements Repo {
 
-    private final Parser parser;
-    private final FileSystem fileSystem;
+    @NotNull private final Parser parser;
+    @NotNull private final Path workingDirectory;
+    @NotNull private FileSystem fileSystem;
 
-    public RepoImpl(String[] args, Path workingDirectory) {
+    public RepoImpl(@NotNull String[] args, @NotNull Path workingDirectory) {
         parser = new Parser(args);
+        this.workingDirectory = workingDirectory;
         fileSystem = new FileSystemImpl(workingDirectory);
     }
 
@@ -43,7 +45,7 @@ public class RepoImpl implements Repo {
     @Override
     public String execute() throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
-        RepoCommand principleCommand = valueOf(parser.getPrincipleCommandAsString());
+        RepoCommand principleCommand = valueOf(parser.getPrincipleCommandAsString().toUpperCase());
         if (fileSystem.gitExists() && principleCommand == INIT) {
             throw new IncorrectArgsException("Git already exists");
         }
@@ -84,7 +86,6 @@ public class RepoImpl implements Repo {
         new AddCommand(fileSystem, args).run();
         return "successful add";
     }
-
 
     /**
      * Execute 'git branch ...'.
@@ -187,6 +188,7 @@ public class RepoImpl implements Repo {
     @Override
     public String init() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        fileSystem = new FileSystemImpl(workingDirectory, true);
         new InitCommand(fileSystem).run();
         return "Initialized Git repository in " + fileSystem.getGitLocation();
     }
