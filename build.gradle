@@ -5,7 +5,7 @@ apply plugin: 'java'
 
 jar {
     manifest {
-        def manif = "${projectDir}/src/main/java/resources/META-INF/MANIFEST.MF"
+        def manif = "${projectDir}/src/main/resources/META-INF/MANIFEST.MF"
         from file(manif)
     }
     baseName = "git"
