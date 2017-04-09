@@ -1,17 +1,18 @@
 package VCS.Objects.GitObjects;
 
 import VCS.Data.FileSystem;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class Tree extends GitObject {
 
-    private Tree(FileSystem fileSystem, byte[] content) {
+    private Tree(@NotNull FileSystem fileSystem, @NotNull byte[] content) {
         super(fileSystem, buildHash(content), "tree", content.length, content);
     }
 
-    public Tree(FileSystem fileSystem, List<String> filesToCommit,
-                List<String> hashesOfFilesToCommit) {
+    public Tree(@NotNull FileSystem fileSystem, @NotNull List<String> filesToCommit,
+                @NotNull List<String> hashesOfFilesToCommit) {
         this(fileSystem, buildContent(filesToCommit, hashesOfFilesToCommit));
     }
 
@@ -23,8 +24,9 @@ public class Tree extends GitObject {
      * hash2
      * ...
      */
-    private static byte[] buildContent(List<String> filesToCommit, List<String>
-            hashesOfFilesToCommit) {
+    @NotNull
+    private static byte[] buildContent(@NotNull List<String> filesToCommit,
+                                       @NotNull List<String> hashesOfFilesToCommit) {
         String buffer = "";
         for (int i = 0; i < filesToCommit.size(); i++) {
             buffer += filesToCommit.get(i) + "\n" + hashesOfFilesToCommit.get(i) + "\n";

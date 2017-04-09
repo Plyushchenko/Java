@@ -23,6 +23,7 @@ public class Log {
      * @return Log content
      * @throws IOException Unknown IO problem
      */
+    @NotNull
     public String read() throws IOException {
         return fileSystem.getFileContentAsString(logLocation);
     }
@@ -32,7 +33,7 @@ public class Log {
      * @param s String which will be written
      * @throws IOException Unknown IO problem
      */
-    public void write(String s) throws IOException {
+    public void write(@NotNull String s) throws IOException {
         System.out.println("logLocation = " + logLocation);
         fileSystem.appendToFile(logLocation, s);
     }

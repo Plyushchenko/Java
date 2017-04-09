@@ -110,5 +110,6 @@ public interface Repo {
 
 
     @NotNull
-    String status() throws UncommittedChangesException, IncorrectArgsException, UnstagedChangesException, IOException;
+    String status() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException;
 }
