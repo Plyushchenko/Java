@@ -51,4 +51,5 @@ public class BranchDeleteCommand extends Command {
             throw new IncorrectArgsException("trying to delete current branch");
         }
     }
+
 }

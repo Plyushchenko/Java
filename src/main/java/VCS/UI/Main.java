@@ -4,9 +4,7 @@ import VCS.Data.FileSystem;
 import VCS.Repo;
 import VCS.RepoImpl;
 
-/**
- * User interface
- */
+/** User interface */
 public class Main {
 
     /**
@@ -27,4 +25,5 @@ public class Main {
             e.printStackTrace();
         }
     }
+
 }

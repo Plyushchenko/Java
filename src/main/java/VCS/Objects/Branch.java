@@ -5,9 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-/**
- * Branch
- */
+/** Branch */
 public class Branch {
 
     @NotNull private final FileSystem fileSystem;

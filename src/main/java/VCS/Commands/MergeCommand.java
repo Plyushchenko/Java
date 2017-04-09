@@ -4,6 +4,7 @@ import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import VCS.Objects.Branch;
 import VCS.Objects.Head;
 import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -59,10 +60,18 @@ public class MergeCommand extends Command {
         new CommitCommand(fileSystem, "merge '" + branchName + "' branch").run();
     }
 
+    /**
+     * Check that branch exists and is not the current branch
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     */
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
-        if (branchName.equals(new Head(fileSystem).getCurrentBranchName())) {
-            throw new IncorrectArgsException("this is a current branch");
+        if (new Head(fileSystem).getCurrentBranchName().equals(branchName)) {
+            throw new IncorrectArgsException("this is current branch");
+        }
+        if (new Branch(fileSystem, branchName).notExists()) {
+            throw new IncorrectArgsException("branch doesn't exists");
         }
     }
 

@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- * Index
- */
+/** Index */
 public class Index {
 
     @NotNull private final FileSystem fileSystem;

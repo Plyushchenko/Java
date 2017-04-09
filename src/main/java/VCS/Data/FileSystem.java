@@ -54,12 +54,10 @@ public abstract class FileSystem {
         logsLocation = Paths.get(gitLocation + File.separator + "logs");
     }
 
-    /*
     @NotNull
     public Path getWorkingDirectory() {
         return workingDirectory;
     }
-    */
 
     @NotNull
     public Path getGitLocation() {
@@ -85,7 +83,7 @@ public abstract class FileSystem {
     }
 
     @NotNull
-    public Path getObjectsLocation() {
+    Path getObjectsLocation() {
         return objectsLocation;
     }
 
@@ -205,4 +203,5 @@ public abstract class FileSystem {
             throws IOException;
 
     public abstract void createGitDirectoriesAndFiles() throws IOException;
+
 }

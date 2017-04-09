@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/** Tree */
 public class Tree extends GitObject {
 
     private Tree(@NotNull FileSystem fileSystem, @NotNull byte[] content) {

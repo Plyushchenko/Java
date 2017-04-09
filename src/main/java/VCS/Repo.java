@@ -66,7 +66,8 @@ public interface Repo {
             UnstagedChangesException, UncommittedChangesException;
 
     @NotNull
-    String clean() throws UncommittedChangesException, IncorrectArgsException, UnstagedChangesException, IOException;
+    String clean() throws IncorrectArgsException, IOException, UnstagedChangesException,
+            UncommittedChangesException;
 
     /**
      * Execute 'git commit ...'
@@ -112,16 +113,16 @@ public interface Repo {
     String merge(@NotNull String branchName) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
-
     @NotNull
-    String reset(@NotNull String fileToReset) throws UncommittedChangesException,
-            IncorrectArgsException, UnstagedChangesException, IOException;
+    String reset(@NotNull String fileToReset) throws IncorrectArgsException, IOException,
+            UnstagedChangesException, UncommittedChangesException;
 
     @NotNull
     String rm(@NotNull String fileToRm) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
     @NotNull
-    String status() throws UncommittedChangesException, IncorrectArgsException,
-            UnstagedChangesException, IOException;
+    String status() throws IncorrectArgsException, IOException, UnstagedChangesException,
+            UncommittedChangesException;
+
 }

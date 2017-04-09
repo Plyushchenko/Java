@@ -59,7 +59,7 @@ public class CheckoutByCommitCommand extends Command {
     }
 
     /**
-     * Check that commit with passed hash exists
+     * Check that commit exists
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      */
@@ -69,4 +69,5 @@ public class CheckoutByCommitCommand extends Command {
             throw new IncorrectArgsException("commit doesn't exist");
         }
     }
+
 }

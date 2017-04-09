@@ -30,4 +30,5 @@ public abstract class Command {
             UncommittedChangesException;
 
     protected abstract void checkArgsCorrectness() throws IncorrectArgsException, IOException;
+
 }

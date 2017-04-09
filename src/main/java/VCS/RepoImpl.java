@@ -59,6 +59,9 @@ public class RepoImpl implements Repo {
                 return branch(parser.extractBranchCommandArguments());
             case CHECKOUT:
                 return checkout(parser.extractCheckoutCommandArguments());
+            case CLEAN:
+                parser.checkCleanArgsFormatCorrectness();
+                return clean();
             case COMMIT:
                 return commit(parser.extractCommitCommandArguments());
             case INIT:
@@ -148,7 +151,7 @@ public class RepoImpl implements Repo {
      */
     @NotNull
     @Override
-    public String checkout(@NotNull List<String> args) throws IOException, IncorrectArgsException,
+    public String checkout(@NotNull List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
         if (args.size() == 1) {
             if (parser.isHash(args.get(0))) {
@@ -170,8 +173,8 @@ public class RepoImpl implements Repo {
 
     @NotNull
     @Override
-    public String clean() throws UncommittedChangesException, IncorrectArgsException,
-            UnstagedChangesException, IOException {
+    public String clean() throws IncorrectArgsException, IOException, UnstagedChangesException,
+            UncommittedChangesException {
         new CleanCommand(fileSystem).run();
         return "cleaned";
     }
@@ -254,8 +257,8 @@ public class RepoImpl implements Repo {
 
     @NotNull
     @Override
-    public String status() throws UncommittedChangesException, IncorrectArgsException,
-            UnstagedChangesException, IOException {
+    public String status()throws IncorrectArgsException, IOException,
+            UnstagedChangesException, UncommittedChangesException {
         StatusCommand statusCommand = new StatusCommand(fileSystem);
         statusCommand.run();
         return statusCommand.getStatus();

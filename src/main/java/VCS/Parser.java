@@ -3,7 +3,6 @@ package VCS;
 import VCS.Exceptions.IncorrectArgsException;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -136,6 +135,12 @@ class Parser {
     private void checkRmArgsFormatCorrectness() throws IncorrectArgsException {
         if (args.length != 2) {
             throw new IncorrectArgsException("format: git rm file");
+        }
+    }
+
+    void checkCleanArgsFormatCorrectness() throws IncorrectArgsException {
+        if (args.length != 1) {
+            throw new IncorrectArgsException("format: git clean");
         }
     }
 }

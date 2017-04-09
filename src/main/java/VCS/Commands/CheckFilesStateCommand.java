@@ -21,7 +21,7 @@ public class CheckFilesStateCommand extends Command {
     }
 
     /**
-     * Check if files staged and committed
+     * Check that files were staged and committed
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      * @throws UnstagedChangesException Changes were not staged
@@ -39,9 +39,11 @@ public class CheckFilesStateCommand extends Command {
 
     void runWithContent(@NotNull List<String> filesToCommit,
                         @NotNull List<String> hashesOfFilesToCommit)
-            throws IOException, UnstagedChangesException {
+            throws IOException, UnstagedChangesException, UncommittedChangesException {
         checkForUnstagedFiles(filesToCommit, hashesOfFilesToCommit);
+        checkForUncommittedFiles();
     }
+
 
     private void checkForUnstagedFiles() throws IOException, UnstagedChangesException {
         Pair<List<String>, List<String>> p = fileSystem.splitLines(fileSystem.getIndexLocation());
@@ -88,4 +90,5 @@ public class CheckFilesStateCommand extends Command {
 
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {}
+
 }

@@ -29,7 +29,7 @@ public class BranchCreateCommand extends Command {
     /**
      * Create branch.
      * <pre>
-     * Check that files are staged and committed
+     * Check that arguments are correct and files are staged and committed
      * Update log with information about branch creation
      * Update ref of branch with head commit hash of current branch
      * </pre>
@@ -82,4 +82,5 @@ public class BranchCreateCommand extends Command {
         return commitHash + " branch created from " + currentBranchName + " " +
                 new Date(System.currentTimeMillis()) + "\n";
     }
+
 }

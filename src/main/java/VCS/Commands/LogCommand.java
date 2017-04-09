@@ -34,4 +34,5 @@ public class LogCommand extends Command {
     public String getLog() {
         return log;
     }
+
 }

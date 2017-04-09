@@ -45,4 +45,5 @@ public class Log {
     public void delete() throws IOException {
         fileSystem.deleteFile(logLocation);
     }
+
 }

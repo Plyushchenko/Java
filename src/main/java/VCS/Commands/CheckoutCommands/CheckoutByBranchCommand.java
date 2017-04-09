@@ -50,7 +50,7 @@ public class CheckoutByBranchCommand extends Command {
     }
 
     /**
-     * Check that passed branch is not current and exists
+     * Check that branch exists and is not the current branch
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      */
@@ -63,4 +63,5 @@ public class CheckoutByBranchCommand extends Command {
             throw new IncorrectArgsException("branch doesn't exists");
         }
     }
+
 }

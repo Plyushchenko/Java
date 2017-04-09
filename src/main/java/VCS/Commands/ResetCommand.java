@@ -16,16 +16,25 @@ import java.util.List;
 public class ResetCommand extends Command {
 
     private final Path pathToFile;
+
     public ResetCommand(@NotNull FileSystem fileSystem, String fileToReset) {
         super(fileSystem);
         this.pathToFile = Paths.get(fileToReset).toAbsolutePath();
     }
 
-    ResetCommand(FileSystem fileSystem, Path pathToFile) {
+    ResetCommand(@NotNull FileSystem fileSystem, @NotNull Path pathToFile) {
         super(fileSystem);
         this.pathToFile = pathToFile;
     }
 
+    /**
+     * Find the file in index and remove path and hash from index.
+     * If file was not found in index then do nothing
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
@@ -43,11 +52,16 @@ public class ResetCommand extends Command {
         new Index(fileSystem).setContent(indexedFiles, indexedHashes);
     }
 
+    /**
+     * Check that file exists
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     */
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (fileSystem.notExists(pathToFile)) {
             throw new IncorrectArgsException("file doesn't exist");
         }
-
     }
+
 }

@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class RmCommand extends Command{
+/** Rm command*/
+public class RmCommand extends Command {
 
     private final Path pathToFile;
     public RmCommand(@NotNull FileSystem fileSystem, String fileToRm) {
@@ -18,6 +19,14 @@ public class RmCommand extends Command{
         pathToFile = Paths.get(fileToRm).toAbsolutePath();
     }
 
+    /**
+     * Rm.
+     * Reset file and delete it
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
@@ -26,10 +35,16 @@ public class RmCommand extends Command{
         fileSystem.deleteFile(pathToFile);
     }
 
+    /**
+     * Check that file exists
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     */
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (fileSystem.notExists(pathToFile)) {
             throw new IncorrectArgsException("file doesn't exist");
         }
     }
+
 }

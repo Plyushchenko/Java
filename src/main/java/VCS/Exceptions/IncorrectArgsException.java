@@ -8,4 +8,5 @@ public class IncorrectArgsException extends Exception {
     public IncorrectArgsException(@NotNull String message) {
         super(message);
     }
+
 }

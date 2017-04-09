@@ -12,12 +12,6 @@ public class Commit extends GitObject {
     @NotNull private final String COMMIT_AUTHOR = System.getProperty("user.name");
     @NotNull private final Date COMMIT_DATE = new Date(System.currentTimeMillis());
 
-    /**
-     * Build Commit
-     * @param fileSystem File system
-     * @param content Commit content
-     * @param message Commit message
-     */
     public Commit(@NotNull FileSystem fileSystem, byte[] content, @NotNull String message) {
         super(fileSystem, buildHash(content), "commit", content.length, content);
         commitMessage = message;
@@ -48,4 +42,5 @@ public class Commit extends GitObject {
         return getHash() + " " + getCommitMessage() + " " + getCommitAuthor() + " " +
                 getCommitDate() + "\n";
     }
+
 }
