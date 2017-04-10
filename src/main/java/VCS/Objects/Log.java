@@ -14,7 +14,6 @@ public class Log {
 
     public Log(@NotNull FileSystem fileSystem, @NotNull String branchName) {
         this.fileSystem = fileSystem;
-        System.out.println("branchName = " + branchName);
         logLocation = fileSystem.buildLogLocation(branchName);
     }
 
@@ -34,7 +33,6 @@ public class Log {
      * @throws IOException Unknown IO problem
      */
     public void write(@NotNull String s) throws IOException {
-        System.out.println("logLocation = " + logLocation);
         fileSystem.appendToFile(logLocation, s);
     }
 

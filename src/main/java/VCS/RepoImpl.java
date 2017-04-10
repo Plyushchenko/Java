@@ -231,4 +231,7 @@ public class RepoImpl implements Repo {
         return statusCommand.getStatus();
     }
 
+    public FileSystem getFileSystem() {
+        return fileSystem;
+    }
 }
