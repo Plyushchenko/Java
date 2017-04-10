@@ -198,6 +198,7 @@ public class VCSTests {
         new RepoImpl(new String[]{"commit", "-m", "?"}, globalRoot).execute();
         new RepoImpl(new String[]{"checkout", "master"}, globalRoot).execute();
         assertEquals(FILE_CONTENTS.get(0), fileSystem.getFileContentAsString(paths.get(0)));
+        new RepoImpl(new String[]{"branch", "-d", "b"}, globalRoot).execute();
     }
 
     private void init(Path path) throws UncommittedChangesException, IncorrectArgsException,

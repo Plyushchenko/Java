@@ -4,11 +4,8 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 jar {
-    manifest {
-        def manif = "${projectDir}/src/main/resources/META-INF/MANIFEST.MF"
-        from file(manif)
-    }
-    baseName = "git"
+    from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it)} }
+    manifest { attributes 'Main-Class': 'VCS.UI.Main' }
 }
 
 repositories {
