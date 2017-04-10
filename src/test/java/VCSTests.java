@@ -52,7 +52,7 @@ public class VCSTests {
                 Paths.get(globalRoot + File.separator + "file2"),
                 Paths.get(globalRoot + File.separator + "dir" + File.separator + "file3")));
     }
-/*
+
     @Test
     public void initTest() throws UncommittedChangesException, IncorrectArgsException,
             UnstagedChangesException, IOException {
@@ -86,7 +86,6 @@ public class VCSTests {
      * file1 <- newContent1, file2 <- newContent2;
      * git add;
      */
-/*
     @Test
     public void addTest() throws IOException, UnstagedChangesException, UncommittedChangesException,
             IncorrectArgsException {
@@ -108,7 +107,7 @@ public class VCSTests {
                 globalRoot).execute();
         checkIndex(paths.subList(0, 3), hashes.subList(0, 3));
     }
-*/
+
     /**
      * commit;
      * get content of index
@@ -118,7 +117,7 @@ public class VCSTests {
      * compare three arrays representing tree content
      */
 
-/*
+
     @Test
     public void commitTest() throws UncommittedChangesException, IncorrectArgsException,
             UnstagedChangesException, IOException {
@@ -135,7 +134,7 @@ public class VCSTests {
         assertTrue(Arrays.equals(indexContent, commitContent));
         assertTrue(Arrays.equals(commitContent, headCommitContent));
     }
-*/
+
     /**
      * init repo if it's not inited yet
      * create 'a', 'b', 'c', 'd' branches
@@ -145,7 +144,7 @@ public class VCSTests {
      * delete c
      * check branch list
      */
-
+/*
     @Test
     public void branchWithoutChangesTest() throws UncommittedChangesException,
             IncorrectArgsException, UnstagedChangesException, IOException {
@@ -173,7 +172,7 @@ public class VCSTests {
             assertEquals(e.getMessage(), Messages.THIS_IS_THE_CURRENT_BRANCH);
         }
     }
-/*
+
     @Test (expected = UnstagedChangesException.class)
     public void checkoutWithUnstagedChanges() throws UncommittedChangesException,
             IncorrectArgsException, UnstagedChangesException, IOException {
@@ -188,7 +187,7 @@ public class VCSTests {
         addTest();
         branchWithoutChangesTest();
     }
-
+*/
     @Test
     public void fileStateAtBranchesTest() throws UncommittedChangesException,
             IncorrectArgsException, UnstagedChangesException, IOException {
@@ -204,7 +203,7 @@ public class VCSTests {
         assertEquals(FILE_CONTENTS.get(0), fileSystem.getFileContentAsString(paths.get(0)));
         new RepoImpl(new String[]{"branch", "-d", "b"}, globalRoot).execute();
     }
-*/
+
     private void init(Path path) throws UncommittedChangesException, IncorrectArgsException,
             UnstagedChangesException, IOException {
         RepoImpl repo = new RepoImpl(INIT_ARGS, path);
@@ -212,7 +211,7 @@ public class VCSTests {
         fileSystem = repo.getFileSystem();
     }
 
-/*
+
     private void checkIndex(List<Path> paths, List<String> hashes) throws IOException {
         Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
                 fileSystem.getIndexLocation());
@@ -227,5 +226,5 @@ public class VCSTests {
     private String hashFile(Path path) throws IOException {
         return Blob.buildBlob(fileSystem, path).getHash();
     }
-*/
+
 }
