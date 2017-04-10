@@ -51,6 +51,7 @@ public class Index {
             }
         }
         fileSystem.writeToFile(fileSystem.getIndexLocation(), fileSystem.zipLines(content));
+        fileSystem.appendToFile(fileSystem.getIndexLocation(), "\n");
     }
 
 }

@@ -36,16 +36,13 @@ public class BranchListCommand extends Command {
         String currentBranchName = new Head(fileSystem).getCurrentBranchName();
         List<String> refs = fileSystem.getFolderContent(fileSystem.getRefsLocation());
         branchListAsString = "";
-        for (int i = 0; i < refs.size(); i++) {
-            if (refs.get(i).equals(currentBranchName)) {
+        for (String ref : refs) {
+            if (ref.equals(currentBranchName)) {
                 branchListAsString += " *";
             } else {
                 branchListAsString += "  ";
             }
-            branchListAsString += refs.get(i);
-            if (i + 1 != refs.size()) {
-                branchListAsString += "\n";
-            }
+            branchListAsString += ref + "\n";
         }
     }
 

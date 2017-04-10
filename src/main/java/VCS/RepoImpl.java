@@ -9,6 +9,7 @@ import VCS.Commands.CheckoutCommands.CheckoutByCommitCommand;
 import VCS.Data.FileSystem;
 import VCS.Data.FileSystemImpl;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import org.jetbrains.annotations.NotNull;
@@ -47,10 +48,10 @@ public class RepoImpl implements Repo {
             UnstagedChangesException, UncommittedChangesException {
         RepoCommand principleCommand = valueOf(parser.getPrincipleCommandAsString().toUpperCase());
         if (fileSystem.gitExists() && principleCommand == INIT) {
-            throw new IncorrectArgsException("Git already exists");
+            throw new IncorrectArgsException(Messages.GIT_ALREADY_EXISTS);
         }
         if (fileSystem.gitNotExists() && !(principleCommand == INIT)) {
-            throw new IncorrectArgsException("Git doesn't exists");
+            throw new IncorrectArgsException(Messages.GIT_DOESN_T_EXIST);
         }
         switch (principleCommand) {
             case ADD:
