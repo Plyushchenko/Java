@@ -65,6 +65,10 @@ public class MergeCommand extends Command {
         if (branchName.equals(new Head(fileSystem).getCurrentBranchName())) {
             throw new IncorrectArgsException(Messages.THIS_IS_THE_CURRENT_BRANCH);
         }
+        if (new Branch(fileSystem, branchName).notExists()) {
+            throw new IncorrectArgsException(Messages.BRANCH_DOESN_T_EXIST);
+        }
+
     }
 
 }
