@@ -2,6 +2,7 @@ package VCS.Commands;
 
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
@@ -67,11 +68,16 @@ public class MergeCommand extends Command {
      */
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
+<<<<<<< HEAD
         if (new Head(fileSystem).getCurrentBranchName().equals(branchName)) {
             throw new IncorrectArgsException("this is current branch");
         }
         if (new Branch(fileSystem, branchName).notExists()) {
             throw new IncorrectArgsException("branch doesn't exists");
+=======
+        if (branchName.equals(new Head(fileSystem).getCurrentBranchName())) {
+            throw new IncorrectArgsException(Messages.THIS_IS_THE_CURRENT_BRANCH);
+>>>>>>> vcs-fixes
         }
     }
 

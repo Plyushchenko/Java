@@ -4,6 +4,7 @@ import VCS.Commands.CheckFilesStateCommand;
 import VCS.Commands.Command;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
@@ -66,7 +67,7 @@ public class CheckoutByCommitCommand extends Command {
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (fileSystem.notExists(fileSystem.buildObjectLocation(commitHash))) {
-            throw new IncorrectArgsException("commit doesn't exist");
+            throw new IncorrectArgsException(Messages.COMMIT_DOESN_T_EXIST);
         }
     }
 

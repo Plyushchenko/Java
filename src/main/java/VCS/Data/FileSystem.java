@@ -43,7 +43,6 @@ public abstract class FileSystem {
                     break;
                 }
                 tmp = Paths.get(tmp + File.separator + ".mygit");
-                System.out.println(tmp);
             }
         }
         gitLocation = tmp;

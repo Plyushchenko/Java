@@ -4,6 +4,7 @@ import VCS.Commands.CheckFilesStateCommand;
 import VCS.Commands.Command;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
@@ -67,7 +68,7 @@ public class BranchCreateCommand extends Command {
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException {
         if (branch.exists()) {
-            throw new IncorrectArgsException("branch already exists");
+            throw new IncorrectArgsException(Messages.BRANCH_ALREADY_EXISTS);
         }
     }
 

@@ -24,7 +24,7 @@ public class Blob extends GitObject {
     @NotNull
     public static Blob buildBlob(@NotNull FileSystem fileSystem, @NotNull Path path)
             throws IOException {
-        return new Blob(fileSystem, Files.readAllBytes(path));
+        return new Blob(fileSystem, fileSystem.getFileContentAsByteArray(path));
     }
 
 }

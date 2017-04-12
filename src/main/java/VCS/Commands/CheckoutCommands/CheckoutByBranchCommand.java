@@ -4,6 +4,7 @@ import VCS.Commands.CheckFilesStateCommand;
 import VCS.Commands.Command;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
@@ -44,6 +45,7 @@ public class CheckoutByBranchCommand extends Command {
         checkArgsCorrectness();
         new CheckFilesStateCommand(fileSystem).run();
         Path treeLocation = fileSystem.buildTreeLocation(branchName);
+        //TODO: наверное, что-то удалять надо, а не только восстанваливать
         fileSystem.restoreFiles(fileSystem.splitLines(treeLocation));
         fileSystem.copyFile(treeLocation, fileSystem.getIndexLocation());
         repoHead.updateHead(branchName);
@@ -57,10 +59,10 @@ public class CheckoutByBranchCommand extends Command {
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (repoHead.getCurrentBranchName().equals(branchName)) {
-            throw new IncorrectArgsException("this is current branch");
+            throw new IncorrectArgsException(Messages.THIS_IS_THE_CURRENT_BRANCH);
         }
         if (new Branch(fileSystem, branchName).notExists()) {
-            throw new IncorrectArgsException("branch doesn't exists");
+            throw new IncorrectArgsException(Messages.BRANCH_DOESN_T_EXIST);
         }
     }
 

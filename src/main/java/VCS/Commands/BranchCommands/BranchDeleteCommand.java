@@ -1,5 +1,6 @@
 package VCS.Commands.BranchCommands;
 
+import VCS.Exceptions.Messages;
 import VCS.Objects.Branch;
 import VCS.Commands.Command;
 import VCS.Data.FileSystem;
@@ -45,10 +46,10 @@ public class BranchDeleteCommand extends Command {
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (branch.notExists()) {
-            throw new IncorrectArgsException("branch doesn't exists");
+            throw new IncorrectArgsException(Messages.BRANCH_DOESN_T_EXIST);
         }
         if (new Head(fileSystem).getCurrentBranchName().equals(branch.getBranchName())) {
-            throw new IncorrectArgsException("trying to delete current branch");
+            throw new IncorrectArgsException(Messages.THIS_IS_THE_CURRENT_BRANCH);
         }
     }
 

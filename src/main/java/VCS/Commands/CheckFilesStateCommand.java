@@ -55,13 +55,14 @@ public class CheckFilesStateCommand extends Command {
             IOException, UnstagedChangesException {
         String unstagedFiles = "";
         for (int i = 0; i < filesToCommit.size(); i++) {
-            if (!Blob.buildBlob(fileSystem, Paths.get(filesToCommit.get(i))).getHash().equals(
-                    hashesOfFilesToCommit.get(i))) {
+            if (fileSystem.notExists(Paths.get(filesToCommit.get(i)))
+                    || !Blob.buildBlob(fileSystem, Paths.get(filesToCommit.get(i))).getHash()
+                    .equals(hashesOfFilesToCommit.get(i))) {
                 unstagedFiles += filesToCommit.get(i) + "\n";
             }
         }
         if (!unstagedFiles.equals("")) {
-            unstagedFiles = "Add these files:\n" + unstagedFiles;
+            unstagedFiles = "Add/remove these files:\n" + unstagedFiles;
             throw new UnstagedChangesException(unstagedFiles);
         }
     }

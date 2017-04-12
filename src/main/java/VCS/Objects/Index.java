@@ -49,6 +49,7 @@ public class Index {
             }
         }
         fileSystem.writeToFile(fileSystem.getIndexLocation(), fileSystem.zipLines(content));
+        fileSystem.appendToFile(fileSystem.getIndexLocation(), "\n");
     }
 
     public void setContent(@NotNull List<String> filePaths, @NotNull List<String> fileHashes)
