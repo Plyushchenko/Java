@@ -2,6 +2,7 @@ package VCS.Commands;
 
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,7 @@ public class RmCommand extends Command {
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (fileSystem.notExists(pathToFile)) {
-            throw new IncorrectArgsException("file doesn't exist");
+            throw new IncorrectArgsException(Messages.FILE_DOESN_T_EXIST);
         }
     }
 

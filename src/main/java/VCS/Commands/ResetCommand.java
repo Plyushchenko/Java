@@ -2,6 +2,7 @@ package VCS.Commands;
 
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Index;
@@ -58,10 +59,6 @@ public class ResetCommand extends Command {
      * @throws IOException Unknown IO problem
      */
     @Override
-    protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
-        if (fileSystem.notExists(pathToFile)) {
-            throw new IncorrectArgsException("file doesn't exist");
-        }
-    }
+    protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {}
 
 }

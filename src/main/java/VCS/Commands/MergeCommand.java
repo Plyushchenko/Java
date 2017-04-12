@@ -61,23 +61,13 @@ public class MergeCommand extends Command {
         new CommitCommand(fileSystem, "merge '" + branchName + "' branch").run();
     }
 
-    /**
-     * Check that branch exists and is not the current branch
-     * @throws IncorrectArgsException Incorrect args passed
-     * @throws IOException Unknown IO problem
-     */
     @Override
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
-<<<<<<< HEAD
-        if (new Head(fileSystem).getCurrentBranchName().equals(branchName)) {
-            throw new IncorrectArgsException("this is current branch");
-        }
-        if (new Branch(fileSystem, branchName).notExists()) {
-            throw new IncorrectArgsException("branch doesn't exists");
-=======
         if (branchName.equals(new Head(fileSystem).getCurrentBranchName())) {
             throw new IncorrectArgsException(Messages.THIS_IS_THE_CURRENT_BRANCH);
->>>>>>> vcs-fixes
+        }
+        if (new Branch(fileSystem, branchName).notExists()) {
+            throw new IncorrectArgsException(Messages.BRANCH_DOESN_T_EXIST);
         }
     }
 

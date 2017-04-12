@@ -41,9 +41,7 @@ public class CheckFilesStateCommand extends Command {
                         @NotNull List<String> hashesOfFilesToCommit)
             throws IOException, UnstagedChangesException, UncommittedChangesException {
         checkForUnstagedFiles(filesToCommit, hashesOfFilesToCommit);
-        checkForUncommittedFiles();
     }
-
 
     private void checkForUnstagedFiles() throws IOException, UnstagedChangesException {
         Pair<List<String>, List<String>> p = fileSystem.splitLines(fileSystem.getIndexLocation());

@@ -21,7 +21,7 @@ public class InitCommand extends Command {
      * Init.
      * <pre>
      * Create directories anf files for repo
-     * Excecute initial commit and create 'master' branch
+     * Execute initial commit and create 'master' branch
      * </pre>
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem

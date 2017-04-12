@@ -66,6 +66,7 @@ public abstract class FileSystem {
     @NotNull public Path getFolderWithGitLocation() {
         return gitLocation.getParent();
     }
+
     @NotNull
     public Path getIndexLocation() {
         return indexLocation;

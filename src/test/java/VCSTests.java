@@ -36,8 +36,10 @@ public class VCSTests {
             "HOT FIRE",
             "SUPA HOT FIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIRE"));
     private List<Path> paths;
-    private final String[] INIT_ARGS = {"init"};
-    private final String[] BRANCH_ARGS = {"branch"};
+    private static final String[] INIT_ARGS = {"init"};
+    private static final String[] BRANCH_ARGS = {"branch"};
+    private static final String[] STATUS_ARGS = {"status"};
+    private static final String[] CLEAN_ARGS = {"clean"};
     private Path globalRoot;
     private FileSystem fileSystem;
     private List<String> hashes;
@@ -201,7 +203,6 @@ public class VCSTests {
         new RepoImpl(new String[]{"branch", "-d", "b"}, globalRoot).execute();
     }
 
-
     @Test
     public void checkoutByCommitTest() throws UncommittedChangesException, IncorrectArgsException,
             UnstagedChangesException, IOException {
@@ -283,6 +284,108 @@ public class VCSTests {
         assertTrue(found.get(0) == Boolean.TRUE && found.get(1) == Boolean.TRUE &&
                 found.get(2) == Boolean.FALSE && found.get(3) == Boolean.TRUE);
 
+    }
+
+    @Test
+    public void statusTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        for (int i = 0; i < paths.size(); i++) {
+            fileSystem.writeToFile(paths.get(i), FILE_CONTENTS.get(i));
+        }
+        String status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+        System.out.println(status);
+        for (Path path : paths) {
+            assertTrue(status.contains("untracked: " + path.toString() + "\n"));
+        }
+        new RepoImpl(new String[]{"add", paths.get(0).toString(), paths.get(1).toString()},
+                globalRoot).execute();
+        status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+        System.out.println(status);
+        assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
+        assertTrue(status.contains("staged: " + paths.get(1).toString() + "\n"));
+        assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
+        assertTrue(status.contains("untracked: " + paths.get(3).toString() + "\n"));
+        new RepoImpl(new String[]{"commit", "-m", "commit at master"}, globalRoot).execute();
+        fileSystem.deleteFile(paths.get(1));
+        status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+        System.out.println(status);
+        assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
+        assertTrue(status.contains("deleted: " + paths.get(1).toString() + "\n"));
+        assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
+        assertTrue(status.contains("untracked: " + paths.get(3).toString() + "\n"));
+        fileSystem.writeToFile(paths.get(0), NEW_FILE_CONTENTS.get(0));
+        status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+        System.out.println(status);
+        assertTrue(status.contains("modified: " + paths.get(0).toString() + "\n"));
+        assertTrue(status.contains("deleted: " + paths.get(1).toString() + "\n"));
+        assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
+        assertTrue(status.contains("untracked: " + paths.get(3).toString() + "\n"));
+        new RepoImpl(new String[]{"add", paths.get(0).toString(), paths.get(3).toString()},
+                globalRoot).execute();
+        new RepoImpl(new String[]{"reset", paths.get(1).toString()}, globalRoot).execute();
+        new RepoImpl(new String[]{"commit", "-m", "another one"}, globalRoot).execute();
+        status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+        System.out.println(status);
+        assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
+        assertFalse(status.contains(paths.get(1).toString()));
+        assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
+        assertTrue(status.contains("staged: " + paths.get(3).toString() + "\n"));
+    }
+
+    @Test
+    public void resetTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        String args[] = new String[paths.size() + 1];
+        args[0] = "add";
+        for (int i = 0; i < paths.size(); i++) {
+            fileSystem.writeToFile(paths.get(i), FILE_CONTENTS.get(i));
+            args[i + 1] = paths.get(i).toString();
+        }
+        new RepoImpl(args, globalRoot).execute();
+        String status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+        System.out.println(status);
+        for (Path path : paths) {
+            assertTrue(status.contains("staged: " + path.toString() + "\n"));
+        }
+        for (int i = 0; i < paths.size(); i++) {
+            new RepoImpl(new String[]{"reset", paths.get(i).toString()}, globalRoot).execute();
+            status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+            for (int j = 0; j <= i; j++) {
+                assertTrue(status.contains("untracked: " + paths.get(j).toString() + "\n"));
+            }
+            for (int j = i + 1; j < paths.size(); j++) {
+                assertTrue(status.contains("staged: " + paths.get(j).toString() + "\n"));
+            }
+        }
+    }
+
+    @Test
+    public void rmTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(0));
+        new RepoImpl(new String[]{"add", paths.get(0).toString()}, globalRoot).execute();
+        new RepoImpl(new String[]{"rm", paths.get(0).toString()}, globalRoot).execute();
+        String status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
+        assertFalse(status.contains(paths.get(0).toString()));
+        assertTrue(fileSystem.notExists(paths.get(0)));
+    }
+
+    @Test
+    public void cleanTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        for (int i = 0; i < paths.size(); i++) {
+            fileSystem.writeToFile(paths.get(i), FILE_CONTENTS.get(i));
+        }
+        new RepoImpl(new String[]{"add", paths.get(0).toString()}, globalRoot).execute();
+        new RepoImpl(CLEAN_ARGS, globalRoot).execute();
+        assertTrue(fileSystem.exists(paths.get(0)));
+        for (Path path : paths.subList(1, paths.size())) {
+            assertTrue(fileSystem.notExists(path));
+        }
     }
 
     private void init(Path path) throws UncommittedChangesException, IncorrectArgsException,
