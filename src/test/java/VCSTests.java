@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class VCSTests {
-
     private static final List<String> FILE_CONTENTS = new ArrayList<>(Arrays.asList(
             "this\nis\na\ncontent\nof\nfile",
             "and how about this content",
@@ -144,7 +143,7 @@ public class VCSTests {
      * delete c
      * check branch list
      */
-/*
+
     @Test
     public void branchWithoutChangesTest() throws UncommittedChangesException,
             IncorrectArgsException, UnstagedChangesException, IOException {
@@ -187,7 +186,7 @@ public class VCSTests {
         addTest();
         branchWithoutChangesTest();
     }
-*/
+
     @Test
     public void fileStateAtBranchesTest() throws UncommittedChangesException,
             IncorrectArgsException, UnstagedChangesException, IOException {
