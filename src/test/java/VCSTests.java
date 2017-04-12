@@ -4,6 +4,7 @@ import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.GitObjects.Blob;
+import VCS.Objects.Head;
 import VCS.RepoImpl;
 import javafx.util.Pair;
 import org.junit.Before;
@@ -16,10 +17,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class VCSTests {
     private static final List<String> FILE_CONTENTS = new ArrayList<>(Arrays.asList(
@@ -115,8 +116,6 @@ public class VCSTests {
      * 2. commit -> tree
      * compare three arrays representing tree content
      */
-
-
     @Test
     public void commitTest() throws UncommittedChangesException, IncorrectArgsException,
             UnstagedChangesException, IOException {
@@ -143,7 +142,6 @@ public class VCSTests {
      * delete c
      * check branch list
      */
-
     @Test
     public void branchWithoutChangesTest() throws UncommittedChangesException,
             IncorrectArgsException, UnstagedChangesException, IOException {
@@ -203,13 +201,96 @@ public class VCSTests {
         new RepoImpl(new String[]{"branch", "-d", "b"}, globalRoot).execute();
     }
 
+
+    @Test
+    public void checkoutByCommitTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        List<String> hashes = new ArrayList<>();
+        String[] addArgs = new String[]{"add", paths.get(0).toString()};
+        for (int i = 0; i < FILE_CONTENTS.size(); i++) {
+            fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(i));
+            new RepoImpl(addArgs, globalRoot).execute();
+            hashes.add(new RepoImpl(new String[]{"commit", "-m", "commit#" + String.valueOf(i)},
+                    globalRoot).execute());
+        }
+        for (int i = 0; i < hashes.size(); i++) {
+            new RepoImpl(new String[]{"checkout", hashes.get(i)}, globalRoot).execute();
+            assertEquals(FILE_CONTENTS.get(i), fileSystem.getFileContentAsString(paths.get(0)));
+            assertEquals(hashes.get(i), new Head(fileSystem).getHeadCommitHash());
+        }
+    }
+
+    @Test
+    public void checkoutByBranchTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        String[] addArgs = new String[]{"add", paths.get(0).toString(), paths.get(1).toString()};
+        String[] commitArgs = new String[]{"commit", "-m", "commit message"};
+        List<String> branches = Arrays.asList("master", "a", "b", "c", "d");
+        for (int i = 0; i < branches.size(); i++) {
+            try {
+                String[] args = new String[]{"checkout", "-b", branches.get(i)};
+                new RepoImpl(args, globalRoot).execute();
+            } catch (IncorrectArgsException e) {
+                assertEquals("master", branches.get(i));
+                assertEquals(Messages.BRANCH_ALREADY_EXISTS, e.getMessage());
+            }
+            fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(i));
+            fileSystem.writeToFile(paths.get(1), NEW_FILE_CONTENTS.get(i));
+            new RepoImpl(addArgs, globalRoot).execute();
+            new RepoImpl(commitArgs, globalRoot).execute();
+        }
+        for (int i = 0; i < branches.size(); i++) {
+            String[] args = new String[]{"checkout", branches.get(i)};
+            new RepoImpl(args, globalRoot).execute();
+            assertEquals(FILE_CONTENTS.get(i), fileSystem.getFileContentAsString(paths.get(0)));
+            assertEquals(NEW_FILE_CONTENTS.get(i), fileSystem.getFileContentAsString(paths.get(1)));
+        }
+    }
+
+    @Test
+    public void mergeTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(0));
+        fileSystem.writeToFile(paths.get(1), FILE_CONTENTS.get(1));
+        new RepoImpl(new String[]{"add", paths.get(0).toString(), paths.get(1).toString()},
+                globalRoot).execute();
+        String commitHash = new RepoImpl(new String[]{"commit", "-m", "commit at master"},
+                globalRoot).execute();
+        fileSystem.writeToFile(paths.get(2), FILE_CONTENTS.get(2));
+        new RepoImpl(new String[]{"add", paths.get(2).toString()}, globalRoot).execute();
+        new RepoImpl(new String[]{"commit", "-m", "another commit at master"}, globalRoot)
+                .execute();
+        new RepoImpl(new String[]{"checkout", commitHash}, globalRoot).execute();
+        new RepoImpl(new String[]{"checkout", "-b", "b"}, globalRoot).execute();
+        fileSystem.writeToFile(paths.get(3), NEW_FILE_CONTENTS.get(3));
+        new RepoImpl(new String[]{"add", paths.get(3).toString()}, globalRoot).execute();
+        new RepoImpl(new String[]{"commit", "-m", "commit at b"}, globalRoot).execute();
+        new RepoImpl(new String[]{"merge", "master"}, globalRoot).execute();
+        Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
+                fileSystem.getIndexLocation());
+        List<String> indexedFiles = indexContent.getKey();
+        List<String> indexedHashes = indexContent.getValue();
+        List<Boolean> found = new ArrayList<>(Collections.nCopies(4, Boolean.FALSE));
+        for (int i = 0; i < indexedFiles.size(); i++) {
+            int j = paths.indexOf(Paths.get(indexedFiles.get(i)));
+            assertNotEquals(-1, j);
+            found.set(j, Boolean.TRUE);
+            assertEquals(hashFile(paths.get(j)), indexedHashes.get(i));
+        }
+        assertTrue(found.get(0) == Boolean.TRUE && found.get(1) == Boolean.TRUE &&
+                found.get(2) == Boolean.FALSE && found.get(3) == Boolean.TRUE);
+
+    }
+
     private void init(Path path) throws UncommittedChangesException, IncorrectArgsException,
             UnstagedChangesException, IOException {
         RepoImpl repo = new RepoImpl(INIT_ARGS, path);
         repo.execute();
         fileSystem = repo.getFileSystem();
     }
-
 
     private void checkIndex(List<Path> paths, List<String> hashes) throws IOException {
         Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(

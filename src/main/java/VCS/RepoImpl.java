@@ -71,7 +71,7 @@ public class RepoImpl implements Repo {
             case MERGE:
                 return merge(parser.extractMergeCommandArguments());
             default:
-                throw new IncorrectArgsException("No such command");
+                throw new IncorrectArgsException(Messages.NO_SUCH_COMMAND);
         }
     }
 

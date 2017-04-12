@@ -1,6 +1,7 @@
 package VCS.Commands;
 
 import VCS.Data.FileSystem;
+import VCS.Exceptions.Messages;
 import VCS.Objects.Index;
 import VCS.Exceptions.IncorrectArgsException;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,7 @@ public class AddCommand extends Command {
     protected void checkArgsCorrectness() throws IncorrectArgsException {
         for (String s : filePaths) {
             if (fileSystem.notExists(Paths.get(s))) {
-                throw new IncorrectArgsException("file doesn't exist: " + s);
+                throw new IncorrectArgsException(Messages.FILE_DOESN_T_EXIST + s);
             }
         }
     }
