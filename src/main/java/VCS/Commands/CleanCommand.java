@@ -4,6 +4,7 @@ import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -13,8 +14,8 @@ import java.util.List;
 /** Clean command */
 public class CleanCommand extends Command {
 
-    public CleanCommand(@NotNull FileSystem fileSystem) {
-        super(fileSystem);
+    public CleanCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
+        super(fileSystem, logger);
     }
 
     /**
@@ -27,12 +28,14 @@ public class CleanCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
-        StatusCommand statusCommand = new StatusCommand(fileSystem);
+        logger.info("begin: CleanCommand.run()");
+        StatusCommand statusCommand = new StatusCommand(fileSystem, logger);
         statusCommand.runWithFolder(fileSystem.getWorkingDirectory());
         List<Path> untracked = statusCommand.getUntracked();
         for (Path path : untracked) {
             fileSystem.deleteFile(path);
         }
+        logger.info("end: CleanCommand.run()");
     }
 
     @Override

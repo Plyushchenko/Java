@@ -7,17 +7,20 @@ import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.GitObjects.Blob;
 import VCS.Objects.Head;
 import javafx.util.Pair;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /** File state checker */
 public class CheckFilesStateCommand extends Command {
 
-    public CheckFilesStateCommand(@NotNull FileSystem fileSystem) {
-        super(fileSystem);
+    public CheckFilesStateCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
+        super(fileSystem, logger);
     }
 
     /**
@@ -30,17 +33,25 @@ public class CheckFilesStateCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: CheckFilesStateCommand.run()");
         if (new Head(fileSystem).getCurrentBranchName().equals("")){
+            logger.info("end: CheckFilesStateCommand.run(), nothing to check");
             return;
         }
         checkForUnstagedFiles();
         checkForUncommittedFiles();
+        logger.info("end: CheckFilesStateCommand.run()");
     }
 
     void runWithContent(@NotNull List<String> filesToCommit,
                         @NotNull List<String> hashesOfFilesToCommit)
             throws IOException, UnstagedChangesException, UncommittedChangesException {
+        String loggerInfo = "CheckFilesStateCommand.runWithContent([" +
+                filesToCommit.stream().collect(Collectors.joining(",")) + "], [" +
+                hashesOfFilesToCommit.stream().collect(Collectors.joining(",")) + "])";
+        logger.info("begin: " + loggerInfo);
         checkForUnstagedFiles(filesToCommit, hashesOfFilesToCommit);
+        logger.info("end: " + loggerInfo);
     }
 
     private void checkForUnstagedFiles() throws IOException, UnstagedChangesException {

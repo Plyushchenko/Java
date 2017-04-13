@@ -8,10 +8,12 @@ import VCS.Commands.CheckoutCommands.CheckoutByBranchCommand;
 import VCS.Commands.CheckoutCommands.CheckoutByCommitCommand;
 import VCS.Data.FileSystem;
 import VCS.Data.FileSystemImpl;
+import VCS.Data.LoggerBuilder;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -27,11 +29,13 @@ public class RepoImpl implements Repo {
     @NotNull private final Parser parser;
     @NotNull private final Path workingDirectory;
     @NotNull private FileSystem fileSystem;
+    @NotNull private Logger logger;
 
     public RepoImpl(@NotNull String[] args, @NotNull Path workingDirectory) {
         parser = new Parser(args);
         this.workingDirectory = workingDirectory;
         fileSystem = new FileSystemImpl(workingDirectory);
+        logger = LoggerBuilder.buildLogger(fileSystem);
     }
 
     /**
@@ -53,6 +57,7 @@ public class RepoImpl implements Repo {
         if (fileSystem.gitNotExists() && !(principleCommand == INIT)) {
             throw new IncorrectArgsException(Messages.GIT_DOESN_T_EXIST);
         }
+        logger.trace("execute()");
         switch (principleCommand) {
             case ADD:
                 return add(parser.extractAddCommandArguments());
@@ -94,7 +99,9 @@ public class RepoImpl implements Repo {
     @NotNull
     @Override
     public String add(@NotNull List<String> args) throws IncorrectArgsException, IOException {
-        new AddCommand(fileSystem, args).run();
+        logger.trace("begin add()");
+        new AddCommand(fileSystem, logger, args).run();
+        logger.trace("end add()");
         return "successful add";
     }
 
@@ -116,22 +123,28 @@ public class RepoImpl implements Repo {
     public String branch(@NotNull List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
         if (args.size() == 0) {
-            BranchListCommand branchListCommand = new BranchListCommand(fileSystem);
+            logger.trace("begin branchList");
+            BranchListCommand branchListCommand = new BranchListCommand(fileSystem, logger);
             branchListCommand.run();
+            logger.trace("end branchList");
             return branchListCommand.getBranchList();
         } else {
             String branchName;
             if (args.size() == 1) {
+                logger.trace("begin branchCreate");
                 branchName = args.get(0);
-                BranchCreateCommand branchCreateCommand = new BranchCreateCommand(fileSystem,
-                        branchName);
+                BranchCreateCommand branchCreateCommand =
+                        new BranchCreateCommand(fileSystem, logger, branchName);
                 branchCreateCommand.run();
+                logger.trace("end branchCreate");
                 return "branch " + branchName + " created";
             } else {
+                logger.trace("begin branchDelete");
                 branchName = args.get(1);
-                BranchDeleteCommand branchDeleteCommand = new BranchDeleteCommand(fileSystem,
-                        branchName);
+                BranchDeleteCommand branchDeleteCommand =
+                        new BranchDeleteCommand(fileSystem, logger, branchName);
                 branchDeleteCommand.run();
+                logger.trace("end branchDelete");
                 return "branch " + branchName + " deleted";
             }
         }
@@ -156,18 +169,24 @@ public class RepoImpl implements Repo {
             UnstagedChangesException, UncommittedChangesException {
         if (args.size() == 1) {
             if (parser.isHash(args.get(0))) {
+                logger.trace("begin CheckoutByCommit");
                 String commitHash = args.get(0);
-                new CheckoutByCommitCommand(fileSystem, commitHash).run();
+                new CheckoutByCommitCommand(fileSystem, logger, commitHash).run();
+                logger.trace("end CheckoutByCommit");
                 return "checkout: " +  commitHash + " commit";
             } else {
+                logger.trace("begin CheckoutByBranch");
                 String branchName = args.get(0);
-                new CheckoutByBranchCommand(fileSystem, branchName).run();
+                new CheckoutByBranchCommand(fileSystem, logger, branchName).run();
+                logger.trace("end CheckoutByBranch");
                 return "checkout: '" + branchName + "' branch";
             }
         } else {
+            logger.trace("begin BranchCreate&CheckoutByBranch");
             String branchName = args.get(1);
-            new BranchCreateCommand(fileSystem, branchName).run();
-            new CheckoutByBranchCommand(fileSystem, branchName).run();
+            new BranchCreateCommand(fileSystem, logger,branchName).run();
+            new CheckoutByBranchCommand(fileSystem, logger, branchName).run();
+            logger.trace("end BranchCreate&CheckoutByBranch");
             return "create & checkout: '" + branchName + "' branch";
         }
     }
@@ -176,7 +195,9 @@ public class RepoImpl implements Repo {
     @Override
     public String clean() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
-        new CleanCommand(fileSystem).run();
+        logger.trace("begin clean()");
+        new CleanCommand(fileSystem, logger).run();
+        logger.trace("end clean()");
         return "cleaned";
     }
     /**
@@ -190,8 +211,10 @@ public class RepoImpl implements Repo {
     @Override
     public String commit(@NotNull String message) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
-        CommitCommand commitCommand = new CommitCommand(fileSystem, message);
+        logger.trace("begin commit()");
+        CommitCommand commitCommand = new CommitCommand(fileSystem, logger, message);
         commitCommand.run();
+        logger.trace("end commit()");
         return commitCommand.getCommitHash();
     }
 
@@ -206,8 +229,10 @@ public class RepoImpl implements Repo {
     @Override
     public String init() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.trace("begin init()");
         fileSystem = new FileSystemImpl(workingDirectory, true);
-        new InitCommand(fileSystem).run();
+        new InitCommand(fileSystem, logger).run();
+        logger.trace("end init()");
         return "Initialized Git repository in " + fileSystem.getGitLocation();
     }
 
@@ -218,8 +243,10 @@ public class RepoImpl implements Repo {
     @NotNull
     @Override
     public String log() throws IOException {
-        LogCommand logCommand = new LogCommand(fileSystem);
+        logger.trace("begin log()");
+        LogCommand logCommand = new LogCommand(fileSystem, logger);
         logCommand.run();
+        logger.trace("end log()");
         return logCommand.getLog();
     }
 
@@ -236,7 +263,9 @@ public class RepoImpl implements Repo {
     @Override
     public String merge(@NotNull String branchName) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
-        new MergeCommand(fileSystem, branchName).run();
+        logger.trace("begin merge()");
+        new MergeCommand(fileSystem, logger, branchName).run();
+        logger.trace("end merge()");
         return "'" + branchName + "' branch merged into current branch";
     }
 
@@ -244,7 +273,9 @@ public class RepoImpl implements Repo {
     @Override
     public String reset(@NotNull String fileToReset) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
-        new ResetCommand(fileSystem, fileToReset).run();
+        logger.trace("begin reset()");
+        new ResetCommand(fileSystem, logger, fileToReset).run();
+        logger.trace("end reset()");
         return "reset file: " + fileToReset;
     }
 
@@ -252,7 +283,9 @@ public class RepoImpl implements Repo {
     @Override
     public String rm(@NotNull String fileToRm) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
-        new RmCommand(fileSystem, fileToRm).run();
+        logger.trace("begin rm()");
+        new RmCommand(fileSystem, logger, fileToRm).run();
+        logger.trace("end rm()");
         return "rm file: " + fileToRm;
     }
 
@@ -260,11 +293,14 @@ public class RepoImpl implements Repo {
     @Override
     public String status()throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
-        StatusCommand statusCommand = new StatusCommand(fileSystem);
+        logger.trace("begin status()");
+        StatusCommand statusCommand = new StatusCommand(fileSystem, logger);
         statusCommand.run();
+        logger.trace("end status()");
         return statusCommand.getStatus();
     }
 
+    @NotNull
     public FileSystem getFileSystem() {
         return fileSystem;
     }

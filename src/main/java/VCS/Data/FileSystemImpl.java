@@ -1,6 +1,7 @@
 package VCS.Data;
 
 import javafx.util.Pair;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /** File utils for git (mostly wrappers of java.io/java.nio commands */
 public class FileSystemImpl extends FileSystem {
@@ -104,6 +106,15 @@ public class FileSystemImpl extends FileSystem {
     @Override
     public void deleteFile(@NotNull Path path) throws IOException {
         Files.deleteIfExists(path);
+    }
+
+    @NotNull
+    @Override
+    public List<Path> getFolderContent(@NotNull Path path) throws IOException {
+        return FileUtils.listFiles(path.toFile(), null, true)
+                .stream()
+                .map(File::toPath)
+                .collect(Collectors.toList());
     }
 
     @Override

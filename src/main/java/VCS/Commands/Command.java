@@ -4,19 +4,20 @@ import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-/**
- * Git command
- */
+/** Git command */
 public abstract class Command {
 
     @NotNull protected final FileSystem fileSystem;
+    @NotNull protected final Logger logger;
 
-    protected Command(@NotNull FileSystem fileSystem) {
+    protected Command(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
         this.fileSystem = fileSystem;
+        this.logger = logger;
     }
 
     /**

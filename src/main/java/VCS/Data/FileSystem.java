@@ -1,8 +1,9 @@
 package VCS.Data;
 
 import javafx.util.Pair;
-import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /** File utils for git*/
 public abstract class FileSystem {
@@ -26,6 +26,7 @@ public abstract class FileSystem {
     @NotNull private final Path headLocation;
     @NotNull final Path objectsLocation;
     @NotNull final Path logsLocation;
+    @NotNull private Path loggerLocation;
 
     public FileSystem(@NotNull Path workingDirectory) {
         this(workingDirectory, false);
@@ -51,6 +52,8 @@ public abstract class FileSystem {
         headLocation = Paths.get(gitLocation + File.separator + "HEAD");
         objectsLocation = Paths.get(gitLocation + File.separator + "objects");
         logsLocation = Paths.get(gitLocation + File.separator + "logs");
+        loggerLocation =
+                Paths.get(System.getProperty("user.home") + File.separator + "" + ".mygitlogger");
     }
 
     @NotNull
@@ -180,12 +183,7 @@ public abstract class FileSystem {
     public abstract void deleteFile(@NotNull Path path) throws IOException;
 
     @NotNull
-    public List<Path> getFolderContent(@NotNull Path path) throws IOException {
-        return FileUtils.listFiles(path.toFile(), null, true)
-                .stream()
-                .map(File::toPath)
-                .collect(Collectors.toList());
-    }
+    public abstract List<Path> getFolderContent(@NotNull Path path) throws IOException;
 
     public abstract void restoreFiles(@NotNull Pair<List<String>, List<String>> content)
             throws IOException;
@@ -204,4 +202,8 @@ public abstract class FileSystem {
 
     public abstract void createGitDirectoriesAndFiles() throws IOException;
 
+    @NotNull
+    public Path getLoggerLocation() {
+        return loggerLocation;
+    }
 }

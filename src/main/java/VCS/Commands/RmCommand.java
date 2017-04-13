@@ -5,6 +5,7 @@ import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -15,8 +16,9 @@ import java.nio.file.Paths;
 public class RmCommand extends Command {
 
     private final Path pathToFile;
-    public RmCommand(@NotNull FileSystem fileSystem, String fileToRm) {
-        super(fileSystem);
+    public RmCommand(@NotNull FileSystem fileSystem , @NotNull Logger logger,
+                     @NotNull String fileToRm) {
+        super(fileSystem, logger);
         pathToFile = Paths.get(fileToRm).toAbsolutePath();
     }
 
@@ -31,9 +33,11 @@ public class RmCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: RmCommand.run()");
         checkArgsCorrectness();
-        new ResetCommand(fileSystem, pathToFile).run();
+        new ResetCommand(fileSystem, logger, pathToFile).run();
         fileSystem.deleteFile(pathToFile);
+        logger.info("end: RmCommand.run()");
     }
 
     /**

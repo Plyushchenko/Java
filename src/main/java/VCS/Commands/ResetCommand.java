@@ -2,11 +2,11 @@ package VCS.Commands;
 
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
-import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Index;
 import javafx.util.Pair;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,13 +18,15 @@ public class ResetCommand extends Command {
 
     private final Path pathToFile;
 
-    public ResetCommand(@NotNull FileSystem fileSystem, String fileToReset) {
-        super(fileSystem);
+    public ResetCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger,
+                        @NotNull String fileToReset) {
+        super(fileSystem, logger);
         this.pathToFile = Paths.get(fileToReset).toAbsolutePath();
     }
 
-    ResetCommand(@NotNull FileSystem fileSystem, @NotNull Path pathToFile) {
-        super(fileSystem);
+    ResetCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger, @NotNull Path
+            pathToFile) {
+        super(fileSystem, logger);
         this.pathToFile = pathToFile;
     }
 
@@ -39,6 +41,7 @@ public class ResetCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: ResetCommand.run()");
         checkArgsCorrectness();
         Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
                 fileSystem.getIndexLocation());
@@ -51,6 +54,7 @@ public class ResetCommand extends Command {
         indexedFiles.remove(i);
         indexedHashes.remove(i);
         new Index(fileSystem).setContent(indexedFiles, indexedHashes);
+        logger.info("end: ResetCommand.run()");
     }
 
     /**

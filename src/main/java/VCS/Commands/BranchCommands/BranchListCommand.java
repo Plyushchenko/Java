@@ -4,11 +4,11 @@ import VCS.Commands.Command;
 import VCS.Data.FileSystem;
 import VCS.Objects.Head;
 import VCS.Exceptions.IncorrectArgsException;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,8 +18,8 @@ public class BranchListCommand extends Command {
 
     @NotNull private String branchListAsString = "";
 
-    public BranchListCommand(@NotNull FileSystem fileSystem) {
-        super(fileSystem);
+    public BranchListCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
+        super(fileSystem, logger);
     }
 
     /**
@@ -37,6 +37,7 @@ public class BranchListCommand extends Command {
      */
     @Override
     public void run() throws IncorrectArgsException, IOException {
+        logger.info("begin: BranchListCommand.run()");
         String currentBranchName = new Head(fileSystem).getCurrentBranchName();
         List<String> refs = fileSystem.getFolderContent(fileSystem.getRefsLocation())
                 .stream()
@@ -52,6 +53,7 @@ public class BranchListCommand extends Command {
             }
             branchListAsString += ref + "\n";
         }
+        logger.info("end: BranchListCommand.run()");
     }
 
     @Override

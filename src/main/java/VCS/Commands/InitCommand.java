@@ -6,6 +6,7 @@ import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -13,8 +14,8 @@ import java.io.IOException;
 /** Init command */
 public class InitCommand extends Command {
 
-    public InitCommand(@NotNull FileSystem fileSystem) {
-        super(fileSystem);
+    public InitCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
+        super(fileSystem, logger);
     }
 
     /**
@@ -31,12 +32,15 @@ public class InitCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: CommitCommand.run()");
         fileSystem.createGitDirectoriesAndFiles();
-        CommitCommand initialCommitCommand = new CommitCommand(fileSystem, "initial commit");
+        CommitCommand initialCommitCommand =
+                new CommitCommand(fileSystem, logger, "initial " + "commit");
         initialCommitCommand.run();
         String initialCommitHash = initialCommitCommand.getCommitHash();
-        new BranchCreateCommand(fileSystem, "master").runMaster(initialCommitHash);
-        new CheckoutByBranchCommand(fileSystem, "master").run();
+        new BranchCreateCommand(fileSystem, logger, "master").runMaster(initialCommitHash);
+         new CheckoutByBranchCommand(fileSystem, logger, "master").run();
+        logger.info("end: CommitCommand.run()");
     }
 
     @Override

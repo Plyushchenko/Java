@@ -7,6 +7,7 @@ import VCS.Data.FileSystem;
 import VCS.Objects.Head;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Objects.Log;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -16,8 +17,9 @@ public class BranchDeleteCommand extends Command {
 
     @NotNull private final Branch branch;
 
-    public BranchDeleteCommand(@NotNull FileSystem fileSystem, @NotNull String branchName) {
-        super(fileSystem);
+    public BranchDeleteCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger,
+                               @NotNull String branchName) {
+        super(fileSystem, logger);
         branch = new Branch(fileSystem, branchName);
     }
 
@@ -33,9 +35,11 @@ public class BranchDeleteCommand extends Command {
      */
     @Override
     public void run() throws IOException, IncorrectArgsException {
+        logger.info("begin: BranchDeleteCommand.run()");
         checkArgsCorrectness();
         new Log(fileSystem, branch.getBranchName()).delete();
         branch.deleteRef();
+        logger.info("end: BranchDeleteCommand.run()");
     }
 
     /**

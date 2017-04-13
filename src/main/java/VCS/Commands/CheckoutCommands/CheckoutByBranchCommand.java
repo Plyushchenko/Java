@@ -9,6 +9,7 @@ import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.Head;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -20,8 +21,9 @@ public class CheckoutByBranchCommand extends Command {
     @NotNull private final String branchName;
     @NotNull private final Head repoHead;
 
-    public CheckoutByBranchCommand(@NotNull FileSystem fileSystem, @NotNull String branchName) {
-        super(fileSystem);
+    public CheckoutByBranchCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger,
+                                   @NotNull String branchName) {
+        super(fileSystem, logger);
         this.branchName = branchName;
         repoHead = new Head(fileSystem);
     }
@@ -42,13 +44,14 @@ public class CheckoutByBranchCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: CheckoutByBranchCommand.run()");
         checkArgsCorrectness();
-        new CheckFilesStateCommand(fileSystem).run();
+        new CheckFilesStateCommand(fileSystem, logger).run();
         Path treeLocation = fileSystem.buildTreeLocation(branchName);
-        //TODO: наверное, что-то удалять надо, а не только восстанваливать
         fileSystem.restoreFiles(fileSystem.splitLines(treeLocation));
         fileSystem.copyFile(treeLocation, fileSystem.getIndexLocation());
         repoHead.updateHead(branchName);
+        logger.info("end: CheckoutByBranchCommand.run()");
     }
 
     /**

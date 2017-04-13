@@ -294,14 +294,12 @@ public class VCSTests {
             fileSystem.writeToFile(paths.get(i), FILE_CONTENTS.get(i));
         }
         String status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        System.out.println(status);
         for (Path path : paths) {
             assertTrue(status.contains("untracked: " + path.toString() + "\n"));
         }
         new RepoImpl(new String[]{"add", paths.get(0).toString(), paths.get(1).toString()},
                 globalRoot).execute();
         status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        System.out.println(status);
         assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
         assertTrue(status.contains("staged: " + paths.get(1).toString() + "\n"));
         assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
@@ -309,14 +307,12 @@ public class VCSTests {
         new RepoImpl(new String[]{"commit", "-m", "commit at master"}, globalRoot).execute();
         fileSystem.deleteFile(paths.get(1));
         status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        System.out.println(status);
         assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
         assertTrue(status.contains("deleted: " + paths.get(1).toString() + "\n"));
         assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
         assertTrue(status.contains("untracked: " + paths.get(3).toString() + "\n"));
         fileSystem.writeToFile(paths.get(0), NEW_FILE_CONTENTS.get(0));
         status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        System.out.println(status);
         assertTrue(status.contains("modified: " + paths.get(0).toString() + "\n"));
         assertTrue(status.contains("deleted: " + paths.get(1).toString() + "\n"));
         assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
@@ -326,7 +322,6 @@ public class VCSTests {
         new RepoImpl(new String[]{"reset", paths.get(1).toString()}, globalRoot).execute();
         new RepoImpl(new String[]{"commit", "-m", "another one"}, globalRoot).execute();
         status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        System.out.println(status);
         assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
         assertFalse(status.contains(paths.get(1).toString()));
         assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
@@ -345,7 +340,6 @@ public class VCSTests {
         }
         new RepoImpl(args, globalRoot).execute();
         String status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        System.out.println(status);
         for (Path path : paths) {
             assertTrue(status.contains("staged: " + path.toString() + "\n"));
         }

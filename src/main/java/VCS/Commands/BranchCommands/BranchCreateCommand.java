@@ -10,6 +10,7 @@ import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.Head;
 import VCS.Objects.Log;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,8 +22,9 @@ public class BranchCreateCommand extends Command {
     @NotNull private final Head repoHead;
     @NotNull private final Branch branch;
 
-    public BranchCreateCommand(@NotNull FileSystem fileSystem, @NotNull String branchName) {
-        super(fileSystem);
+    public BranchCreateCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger,
+                               @NotNull String branchName) {
+        super(fileSystem, logger);
         branch = new Branch(fileSystem, branchName);
         repoHead = new Head(fileSystem);
     }
@@ -42,11 +44,13 @@ public class BranchCreateCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: BranchCreateCommand.run()");
         checkArgsCorrectness();
-        new CheckFilesStateCommand(fileSystem).run();
+        new CheckFilesStateCommand(fileSystem, logger).run();
         new Log(fileSystem, repoHead.getCurrentBranchName()).write(
                 buildCreateInformation(repoHead.getHeadCommitHash()));
         branch.updateRef(repoHead.getHeadCommitHash());
+        logger.info("end: BranchCreateCommand.run()");
     }
 
     /**
@@ -56,9 +60,10 @@ public class BranchCreateCommand extends Command {
      * @throws IOException Unknown IO problem
      */
     public void runMaster(@NotNull String initialCommitHash) throws IOException {
-        new Log(fileSystem, "master").write(
-                buildCreateInformation(initialCommitHash));
+        logger.info("begin: BranchCreateCommand.runMaster(" + initialCommitHash + ")");
+        new Log(fileSystem, "master").write(buildCreateInformation(initialCommitHash));
         branch.updateRef(initialCommitHash);
+        logger.info("end: BranchCreateCommand.runMaster(" + initialCommitHash + ")");
     }
 
     /**

@@ -10,6 +10,7 @@ import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.Head;
 import VCS.Objects.Log;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,8 +22,9 @@ public class CheckoutByCommitCommand extends Command {
 
     @NotNull private final String commitHash;
 
-    public CheckoutByCommitCommand(@NotNull FileSystem fileSystem, @NotNull String commitHash) {
-        super(fileSystem);
+    public CheckoutByCommitCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger,
+                                   @NotNull String commitHash) {
+        super(fileSystem, logger);
         this.commitHash = commitHash;
     }
 
@@ -43,8 +45,9 @@ public class CheckoutByCommitCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: CheckoutByCommitCommand.run()");
         checkArgsCorrectness();
-        new CheckFilesStateCommand(fileSystem).run();
+        new CheckFilesStateCommand(fileSystem, logger).run();
         Path treeLocation = fileSystem.buildObjectLocation(fileSystem.getFileContentAsString(
                 fileSystem.buildObjectLocation(commitHash)));
         fileSystem.restoreFiles(fileSystem.splitLines(treeLocation));
@@ -52,6 +55,7 @@ public class CheckoutByCommitCommand extends Command {
         String currentBranchName = new Head(fileSystem).getCurrentBranchName();
         new Branch(fileSystem, currentBranchName).updateRef(commitHash);
         new Log(fileSystem, currentBranchName).write(buildCheckoutByCommitInformation());
+        logger.info("end: CheckoutByCommitCommand.run()");
     }
 
     @NotNull

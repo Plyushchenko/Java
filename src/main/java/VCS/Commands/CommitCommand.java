@@ -9,6 +9,7 @@ import VCS.Objects.*;
 import VCS.Objects.GitObjects.Blob;
 import VCS.Objects.GitObjects.Commit;
 import VCS.Objects.GitObjects.Tree;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,8 +22,9 @@ public class CommitCommand extends Command {
     @NotNull private final String message;
     @NotNull private String commitHash = "";
 
-    public CommitCommand(@NotNull FileSystem fileSystem, @NotNull String message) {
-        super(fileSystem);
+    public CommitCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger,
+                         @NotNull String message) {
+        super(fileSystem, logger);
         this.message = message;
     }
 
@@ -43,12 +45,14 @@ public class CommitCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: CommitCommand.run()");
         checkArgsCorrectness();
         Pair<List<String>, List<String>> content = fileSystem.splitLines(
                 fileSystem.getIndexLocation());
         List<String> filesToCommit = content.getKey();
         List<String> hashesOfFilesToCommit = content.getValue();
-        new CheckFilesStateCommand(fileSystem).runWithContent(filesToCommit, hashesOfFilesToCommit);
+        new CheckFilesStateCommand(fileSystem, logger).runWithContent(
+                filesToCommit, hashesOfFilesToCommit);
         for (String s : filesToCommit) {
             Blob blob = Blob.buildBlob(fileSystem, Paths.get(s));
             blob.addObject();
@@ -63,6 +67,7 @@ public class CommitCommand extends Command {
             new Branch(fileSystem, currentBranchName).updateRef(commitHash);
             new Log(fileSystem, currentBranchName).write(commit.toString());
         }
+        logger.info("end: CommitCommand.run()");
     }
 
     @Override

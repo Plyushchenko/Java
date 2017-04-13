@@ -8,6 +8,7 @@ import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.Branch;
 import VCS.Objects.Head;
 import javafx.util.Pair;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,8 +19,9 @@ public class MergeCommand extends Command {
 
     @NotNull private final String branchName;
 
-    public MergeCommand(@NotNull FileSystem fileSystem, @NotNull String branchName) {
-        super(fileSystem);
+    public MergeCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger,
+                        @NotNull String branchName) {
+        super(fileSystem, logger);
         this.branchName = branchName;
     }
 
@@ -34,7 +36,8 @@ public class MergeCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
-        new CheckFilesStateCommand(fileSystem).run();
+        logger.info("begin: MergeCommand.run()");
+        new CheckFilesStateCommand(fileSystem, logger).run();
         Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
                 fileSystem.getIndexLocation());
         List<String> indexedFiles = indexContent.getKey();
@@ -57,8 +60,9 @@ public class MergeCommand extends Command {
                 fileSystem.restoreFile(mergingFiles.get(i), mergingHashes.get(i));
             }
         }
-        new AddCommand(fileSystem, filesToAdd).run();
-        new CommitCommand(fileSystem, "merge '" + branchName + "' branch").run();
+        new AddCommand(fileSystem, logger, filesToAdd).run();
+        new CommitCommand(fileSystem, logger, "merge '" + branchName + "' branch").run();
+        logger.trace("end run()");
     }
 
     @Override

@@ -6,6 +6,7 @@ import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.GitObjects.Blob;
 import javafx.util.Pair;
+import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,8 +22,8 @@ public class StatusCommand extends Command {
     @NotNull private List<Path> staged;
     @NotNull private List<Path> modified;
     @NotNull private List<Path> deleted;
-    public StatusCommand(@NotNull FileSystem fileSystem) {
-        super(fileSystem);
+    public StatusCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
+        super(fileSystem, logger);
         untracked = new ArrayList<>();
         staged = new ArrayList<>();
         modified = new ArrayList<>();
@@ -32,10 +33,13 @@ public class StatusCommand extends Command {
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
+        logger.info("begin: StatusCommand.run()");
         runWithFolder(fileSystem.getFolderWithGitLocation());
+        logger.info("end: StatusCommand.run()");
     }
 
     void runWithFolder(@NotNull Path folderPath) throws IOException {
+        logger.info("begin: StatusCommand.run(" + folderPath + ")");
         List<Path> paths = fileSystem.getFolderContent(folderPath);
         List<Path> pathsNotToShow = fileSystem.getFolderContent(fileSystem.getGitLocation());
         Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
@@ -65,6 +69,7 @@ public class StatusCommand extends Command {
                 deleted.add(Paths.get(indexedFiles.get(i)));
             }
         }
+        logger.info("end: StatusCommand.run(" + folderPath + ")");
     }
 
     @Override

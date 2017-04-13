@@ -19,10 +19,9 @@ public class Main {
             }
             Repo repo = new RepoImpl(args, FileSystem.DEFAULT_WORKING_DIRECTORY);
             String response = repo.execute();
-            System.out.println("response = " + response);
+            System.out.println(response);
         } catch (Exception e) {
             System.out.println("message = " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
