@@ -29,7 +29,7 @@ public interface Repo {
             UncommittedChangesException;
 
     /**
-     * Execute 'git add ...'
+     * Execute 'mygit add ...'
      * @param args File1, file2, ..., fileN
      * @return Response about adding
      * @throws IncorrectArgsException Incorrect args passed
@@ -39,7 +39,7 @@ public interface Repo {
     String add(@NotNull List<String> args) throws IncorrectArgsException, IOException;
 
     /**
-     * Execute 'git branch ...'.
+     * Execute 'mygit branch ...'.
      * @param args [[-d,] branch name]
      * @return Response about branch creation/deletion
      * @throws IncorrectArgsException Incorrect args passed
@@ -52,7 +52,7 @@ public interface Repo {
             UnstagedChangesException, UncommittedChangesException;
 
     /**
-     * Execute 'git checkout ...'
+     * Execute 'mygit checkout ...'
      * @param args [-b,] branch name | commit hash
      * @return Response about checkout
      * @throws IncorrectArgsException Incorrect args passed
@@ -65,7 +65,7 @@ public interface Repo {
             UnstagedChangesException, UncommittedChangesException;
 
     /**
-     * Execute 'git commit ...'
+     * Execute 'mygit commit ...'
      * @param message -m, commit message
      * @return Commit hash
      * @throws IncorrectArgsException Incorrect args passed
@@ -77,7 +77,7 @@ public interface Repo {
             UnstagedChangesException, UncommittedChangesException;
 
     /**
-     * Execute 'git init'
+     * Execute 'mygit init'
      * @return Response about initialization
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
@@ -89,14 +89,14 @@ public interface Repo {
             UncommittedChangesException;
 
     /**
-     * Execute 'git log'
+     * Execute 'mygit log'
      * @throws IOException Unknown IO problem
      */
     @NotNull
     String log() throws IOException;
 
     /**
-     * Execute 'git merge ...'
+     * Execute 'mygit merge ...'
      * @param branchName Branch name
      * @return Response about merging
      * @throws IncorrectArgsException Incorrect args passed

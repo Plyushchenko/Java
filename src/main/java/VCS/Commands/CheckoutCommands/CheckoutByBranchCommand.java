@@ -45,7 +45,6 @@ public class CheckoutByBranchCommand extends Command {
         checkArgsCorrectness();
         new CheckFilesStateCommand(fileSystem).run();
         Path treeLocation = fileSystem.buildTreeLocation(branchName);
-        //TODO: наверное, что-то удалять надо, а не только восстанваливать
         fileSystem.restoreFiles(fileSystem.splitLines(treeLocation));
         fileSystem.copyFile(treeLocation, fileSystem.getIndexLocation());
         repoHead.updateHead(branchName);
