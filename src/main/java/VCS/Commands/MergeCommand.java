@@ -5,6 +5,7 @@ import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import VCS.Objects.Branch;
 import VCS.Objects.Head;
 import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +65,9 @@ public class MergeCommand extends Command {
     protected void checkArgsCorrectness() throws IncorrectArgsException, IOException {
         if (branchName.equals(new Head(fileSystem).getCurrentBranchName())) {
             throw new IncorrectArgsException(Messages.THIS_IS_THE_CURRENT_BRANCH);
+        }
+        if (new Branch(fileSystem, branchName).notExists()) {
+            throw new IncorrectArgsException(Messages.BRANCH_DOESN_T_EXIST);
         }
     }
 
