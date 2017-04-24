@@ -1,7 +1,23 @@
-import org.apache.commons.io.FileUtils;
+import VCS.Commands.BranchCommands.BranchDeleteCommand;
+import VCS.Commands.BranchCommands.BranchListCommand;
+import VCS.Commands.CheckoutCommands.CheckoutByBranchCommand;
+import VCS.Commands.LogCommand;
+import VCS.Data.FileSystem;
+import VCS.Exceptions.IncorrectArgsException;
+import VCS.Exceptions.Messages;
+import VCS.Exceptions.UncommittedChangesException;
+import VCS.Exceptions.UnstagedChangesException;
+import VCS.Objects.Branch;
+import VCS.Objects.GitObjects.Blob;
+import VCS.Objects.Head;
+import VCS.Objects.Log;
+import VCS.RepoImpl;
+import javafx.util.Pair;
+import org.junit.Before;
 import org.junit.Test;
-import vcs.VCS;
-import vcs.vcsexceptions.*;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,227 +29,358 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.powermock.api.mockito.PowerMockito.*;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({BranchListCommand.class, LogCommand.class, CheckoutByBranchCommand.class,
+        BranchDeleteCommand.class})
 public class VCSTests {
 
-    private static File GIT_FOLDER_AS_FILE = new File("./mygit");
-    private static Path GIT_FOLDER_AS_PATH = Paths.get("./mygit");
-    private static final Path INDEX_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "index");
-    private static final Path REFS_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "refs");
-    private static final Path HEAD_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "HEAD");
-    private static final Path OBJECTS_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "objects");
-    private static final Path LOGS_LOCATION = Paths.get(GIT_FOLDER_AS_PATH + File.separator + "logs");
-    private static final List<Path> GIT_FOLDER_AND_ITS_CONTENT = new ArrayList<>(Arrays.asList(GIT_FOLDER_AS_PATH,
-            INDEX_LOCATION, REFS_LOCATION, HEAD_LOCATION, OBJECTS_LOCATION, LOGS_LOCATION));
-    private static File TESTDIR_AS_FILE = new File("testdir");
-    private static final List<Path> FILE_PATHS = new ArrayList<>(Arrays.asList(
-            Paths.get("testdir/file1.txt"),
-            Paths.get("testdir/dir/file2.txt"),
-            Paths.get("testdir/dir/subdir/subsubdir/file3.txt")));
-    private static final List<byte[]> FILE_CONTENTS = new ArrayList<>(Arrays.asList(
-            "this\nis\na\ncontent\nof\nfile".getBytes(),
-            "and how about this content".getBytes(),
-            "hello hello good bye hello".getBytes()));
-    private static final List<byte[]> NEW_FILE_CONTENTS = new ArrayList<>(Arrays.asList(
-            "this\nis\nthe\ncontent\nof\nfile\n(MODIFIED)".getBytes(),
-            "and how about this content. jack. captain jack.".getBytes(),
-            "hello hello good bye hello. still here????????????????????\n\n\n\n\n\n\nahahahahah".getBytes()));
+    private static final List<String> FILE_CONTENTS = new ArrayList<>(Arrays.asList(
+            "this\nis\na\ncontent\nof\nfile",
+            "and how about this content",
+            "hello hello good bye hello",
+            "another test content",
+            "lalalallalalalalall\nlalalalal\nlalalalalal"));
+    private static final List<String> NEW_FILE_CONTENTS = new ArrayList<>(Arrays.asList(
+            "this\nis\nthe\ncontent\nof\nfile\n(MODIFIED)",
+            "and how about this content. jack. captain jack.",
+            "hello hello good hello. still here?????????????\n\n\n\n\n\nahahahahah",
+            "HOT FIRE",
+            "SUPA HOT FIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIRE"));
+    private List<Path> paths;
+    private final String[] INIT_ARGS = {"init"};
+    private final String[] BRANCH_ARGS = {"branch"};
+    private Path globalRoot;
+    private FileSystem fileSystem;
+    private List<String> hashes;
+
+    @Before()
+    public void before() throws IOException {
+        globalRoot = Files.createTempDirectory("globalRoot");
+        paths = new ArrayList<>(Arrays.asList(
+                Paths.get(globalRoot + File.separator + "file0"),
+                Paths.get(globalRoot + File.separator + "dir" + File.separator + "dir"
+                        + File.separator + "file1"),
+                Paths.get(globalRoot + File.separator + "file2"),
+                Paths.get(globalRoot + File.separator + "dir" + File.separator + "file3")));
+    }
 
     @Test
-    public void initTest() throws GitAlreadyInitedException, GitInitException, IOException {
+    public void initTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+    }
+
+    @Test
+    public void doubleInitTest() throws UncommittedChangesException, UnstagedChangesException,
+            IOException {
         try {
-            VCS.init();
-            assert(Files.exists(GIT_FOLDER_AS_PATH));
-            GIT_FOLDER_AND_ITS_CONTENT.forEach(path -> {
-                assert(Files.exists(path));
-            });
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
+            init(globalRoot);
+            init(globalRoot);
+        } catch (IncorrectArgsException e) {
+            assertEquals(e.getMessage(), Messages.GIT_ALREADY_EXISTS);
         }
     }
 
-    @Test (expected = GitAlreadyInitedException.class)
-    public void doubleGitInitTest() throws GitAlreadyInitedException, GitInitException, IOException {
-        try {
-            VCS.init();
-            VCS.init();
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
+    @Test
+    public void nonExistingRepoTest() throws UncommittedChangesException, UnstagedChangesException,
+            IOException {
+        try{
+            new RepoImpl(new String[]{"commit", "-m", "?"}, globalRoot).execute();
+        } catch (IncorrectArgsException e) {
+            assertEquals(e.getMessage(), Messages.GIT_DOESN_T_EXIST);
         }
     }
 
-    @Test (expected = NoGitFoundException.class)
-    public void commitToNonExisitingRepositoryTest() throws ContentWriteException, BranchReadException,
-            NothingChangedSinceLastCommitException, BranchWriteException, HeadReadException, IndexReadException,
-            LogWriteException, NoGitFoundException, ContentReadException {
-        VCS.commit("test");
+    /**
+     * file0 <- content0, file1 <- content1;
+     * git add;
+     * file1 <- newContent1, file2 <- newContent2;
+     * git add;
+     */
+    @Test
+    public void addTest() throws IOException, UnstagedChangesException, UncommittedChangesException,
+            IncorrectArgsException {
+        init(globalRoot);
+        fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(0));
+        fileSystem.writeToFile(paths.get(1), FILE_CONTENTS.get(1));
+        hashes = new ArrayList<>(Arrays.asList(hashFile(paths.get(0)), hashFile
+                (paths.get(1))));
+        new RepoImpl(new String[]{"add", paths.get(0).toString(), paths.get(1).toString()},
+                globalRoot).execute();
+        checkIndex(paths.subList(0, 2), hashes.subList(0, 2));
+        fileSystem.writeToFile(paths.get(1), NEW_FILE_CONTENTS.get(1));
+        fileSystem.writeToFile(paths.get(2), NEW_FILE_CONTENTS.get(2));
+        hashes.set(1, hashFile(paths.get(1)));
+        hashes.add(hashFile(paths.get(2)));
+        new RepoImpl(
+                new String[]{"add", paths.get(0).toString(), paths.get(1).toString(),
+                        paths.get(2).toString()},
+                globalRoot).execute();
+        checkIndex(paths.subList(0, 3), hashes.subList(0, 3));
     }
 
-    @Test (expected = NoBranchFoundException.class)
-    public void checkoutToNonExistingBranchTest() throws GitAlreadyInitedException, GitInitException, BranchAlreadyCreatedException,
-            HeadReadException, BranchReadException, LogWriteException, NoGitFoundException, BranchWriteException, NoBranchFoundException,
-            TreeReadException, ContentReadException, HeadWriteException, ContentWriteException, DirectoryCreateException, IOException {
+    /**
+     * commit;
+     * get content of index
+     * get content of tree associated with commit in two ways:
+     * 1. head -> branch ref -> commit -> tree
+     * 2. commit -> tree
+     * compare three arrays representing tree content
+     */
+    @Test
+    public void commitTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        addTest();
+        String[] args = {"commit", "-m", "test"};
+        String commitHash = new RepoImpl(args, globalRoot).execute();
+        byte[] indexContent = fileSystem.getFileContentAsByteArray(fileSystem.getIndexLocation());
+        byte[] headCommitContent = fileSystem.getFileContentAsByteArray(
+                fileSystem.buildTreeLocation("master"));
+        byte[] commitContent = fileSystem.getFileContentAsByteArray(
+                fileSystem.buildObjectLocation(fileSystem.getFileContentAsString(
+                                fileSystem.buildObjectLocation(commitHash))));
+        assertTrue(Arrays.equals(indexContent, headCommitContent));
+        assertTrue(Arrays.equals(indexContent, commitContent));
+        assertTrue(Arrays.equals(commitContent, headCommitContent));
+    }
+
+    /**
+     * init repo if it's not inited yet
+     * create 'a', 'b', 'c', 'd' branches
+     * check branch list
+     * checkout b
+     * check branch list
+     * delete c
+     * check branch list
+     */
+    @Test
+    public void branchWithoutChangesTest() throws UncommittedChangesException,
+            IncorrectArgsException, UnstagedChangesException, IOException {
         try {
-            VCS.init();
-            for (int i = 0; i < 10; i++) {
-                VCS.createBranch("branch №" + i);
+            init(globalRoot);
+        } catch (IncorrectArgsException e) {
+            //ignore
+        }
+        List<String> branches = Arrays.asList("a", "b", "c", "d");
+        for (String branchName: branches) {
+            String[] args = new String[]{"branch", branchName};
+            new RepoImpl(args, globalRoot).execute();
+        }
+        String atMaster = "  a\n  b\n  c\n  d\n *master\n";
+        assertEquals(atMaster, new RepoImpl(BRANCH_ARGS, globalRoot).execute());
+        new RepoImpl(new String[]{"checkout", "b"}, globalRoot).execute();
+        String atB = "  a\n *b\n  c\n  d\n  master\n";
+        assertEquals(atB, new RepoImpl(BRANCH_ARGS, globalRoot).execute());
+        new RepoImpl(new String[]{"branch", "-d", "c"}, globalRoot).execute();
+        String atBNoC = "  a\n *b\n  d\n  master\n";
+        assertEquals(atBNoC, new RepoImpl(BRANCH_ARGS, globalRoot).execute());
+        try {
+            new RepoImpl(new String[]{"checkout", "b"}, globalRoot).execute();
+        } catch (IncorrectArgsException e) {
+            assertEquals(e.getMessage(), Messages.THIS_IS_THE_CURRENT_BRANCH);
+        }
+    }
+
+    @Test (expected = UnstagedChangesException.class)
+    public void checkoutWithUnstagedChanges() throws UncommittedChangesException,
+            IncorrectArgsException, UnstagedChangesException, IOException {
+        addTest();
+        fileSystem.writeToFile(paths.get(1), "?");
+        branchWithoutChangesTest();
+    }
+
+    @Test (expected = UncommittedChangesException.class)
+    public void checkoutWithUncommittedChanges() throws UncommittedChangesException,
+            IncorrectArgsException, UnstagedChangesException, IOException {
+        addTest();
+        branchWithoutChangesTest();
+    }
+
+    @Test
+    public void fileStateAtBranchesTest() throws UncommittedChangesException,
+            IncorrectArgsException, UnstagedChangesException, IOException {
+        commitTest();
+        new RepoImpl(new String[]{"checkout", "-b", "b"}, globalRoot).execute();
+        fileSystem.writeToFile(paths.get(3), FILE_CONTENTS.get(3));
+        hashes.add(Blob.buildBlob(fileSystem, paths.get(3)).getHash());
+        fileSystem.writeToFile(paths.get(0), NEW_FILE_CONTENTS.get(0));
+        new RepoImpl(new String[]{"add", paths.get(0).toString(), paths.get(3).toString()},
+                globalRoot).execute();
+        new RepoImpl(new String[]{"commit", "-m", "?"}, globalRoot).execute();
+        new RepoImpl(new String[]{"checkout", "master"}, globalRoot).execute();
+        assertEquals(FILE_CONTENTS.get(0), fileSystem.getFileContentAsString(paths.get(0)));
+        new RepoImpl(new String[]{"branch", "-d", "b"}, globalRoot).execute();
+    }
+
+
+    @Test
+    public void checkoutByCommitTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        List<String> hashes = new ArrayList<>();
+        String[] addArgs = new String[]{"add", paths.get(0).toString()};
+        for (int i = 0; i < FILE_CONTENTS.size(); i++) {
+            fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(i));
+            new RepoImpl(addArgs, globalRoot).execute();
+            hashes.add(new RepoImpl(new String[]{"commit", "-m", "commit#" + String.valueOf(i)},
+                    globalRoot).execute());
+        }
+        for (int i = 0; i < hashes.size(); i++) {
+            new RepoImpl(new String[]{"checkout", hashes.get(i)}, globalRoot).execute();
+            assertEquals(FILE_CONTENTS.get(i), fileSystem.getFileContentAsString(paths.get(0)));
+            assertEquals(hashes.get(i), new Head(fileSystem).getHeadCommitHash());
+        }
+    }
+
+    @Test
+    public void checkoutByBranchTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        String[] addArgs = new String[]{"add", paths.get(0).toString(), paths.get(1).toString()};
+        String[] commitArgs = new String[]{"commit", "-m", "commit message"};
+        List<String> branches = Arrays.asList("master", "a", "b", "c", "d");
+        for (int i = 0; i < branches.size(); i++) {
+            try {
+                String[] args = new String[]{"checkout", "-b", branches.get(i)};
+                new RepoImpl(args, globalRoot).execute();
+            } catch (IncorrectArgsException e) {
+                assertEquals("master", branches.get(i));
+                assertEquals(Messages.BRANCH_ALREADY_EXISTS, e.getMessage());
             }
-            VCS.checkout("BAD_BRANCH");
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
+            fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(i));
+            fileSystem.writeToFile(paths.get(1), NEW_FILE_CONTENTS.get(i));
+            new RepoImpl(addArgs, globalRoot).execute();
+            new RepoImpl(commitArgs, globalRoot).execute();
         }
-    }
-
-    @Test (expected =  BranchAlreadyCreatedException.class)
-    public void createAlredyExistingBranchTest() throws GitAlreadyInitedException, GitInitException, BranchAlreadyCreatedException,
-            HeadReadException, BranchReadException, LogWriteException, NoGitFoundException, BranchWriteException, IOException {
-        try {
-            VCS.init();
-            VCS.createBranch("master");
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
+        for (int i = 0; i < branches.size(); i++) {
+            String[] args = new String[]{"checkout", branches.get(i)};
+            new RepoImpl(args, globalRoot).execute();
+            assertEquals(FILE_CONTENTS.get(i), fileSystem.getFileContentAsString(paths.get(0)));
+            assertEquals(NEW_FILE_CONTENTS.get(i), fileSystem.getFileContentAsString(paths.get(1)));
         }
     }
 
     @Test
-    public void addFilesTest() throws GitAlreadyInitedException, GitInitException, IOException, NothingChangedSinceLastAddException,
-            NoIndexFoundException, IndexReadException, AddException, FileToAddNotExistsException, NoGitFoundException {
+    public void mergeTest() throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        init(globalRoot);
+        fileSystem.writeToFile(paths.get(0), FILE_CONTENTS.get(0));
+        fileSystem.writeToFile(paths.get(1), FILE_CONTENTS.get(1));
+        new RepoImpl(new String[]{"add", paths.get(0).toString(), paths.get(1).toString()},
+                globalRoot).execute();
+        String commitHash = new RepoImpl(new String[]{"commit", "-m", "commit at master"},
+                globalRoot).execute();
+        fileSystem.writeToFile(paths.get(2), FILE_CONTENTS.get(2));
+        new RepoImpl(new String[]{"add", paths.get(2).toString()}, globalRoot).execute();
+        new RepoImpl(new String[]{"commit", "-m", "another commit at master"}, globalRoot)
+                .execute();
+        new RepoImpl(new String[]{"checkout", commitHash}, globalRoot).execute();
+        new RepoImpl(new String[]{"checkout", "-b", "b"}, globalRoot).execute();
+        fileSystem.writeToFile(paths.get(3), NEW_FILE_CONTENTS.get(3));
+        new RepoImpl(new String[]{"add", paths.get(3).toString()}, globalRoot).execute();
+        new RepoImpl(new String[]{"commit", "-m", "commit at b"}, globalRoot).execute();
+        new RepoImpl(new String[]{"merge", "master"}, globalRoot).execute();
+        Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
+                fileSystem.getIndexLocation());
+        List<String> indexedFiles = indexContent.getKey();
+        List<String> indexedHashes = indexContent.getValue();
+        List<Boolean> found = new ArrayList<>(Collections.nCopies(4, Boolean.FALSE));
+        for (int i = 0; i < indexedFiles.size(); i++) {
+            int j = paths.indexOf(Paths.get(indexedFiles.get(i)));
+            assertNotEquals(-1, j);
+            found.set(j, Boolean.TRUE);
+            assertEquals(hashFile(paths.get(j)), indexedHashes.get(i));
+        }
+        assertTrue(found.get(0) == Boolean.TRUE && found.get(1) == Boolean.TRUE &&
+                found.get(2) == Boolean.FALSE && found.get(3) == Boolean.TRUE);
+
+    }
+
+    private void init(Path path) throws UncommittedChangesException, IncorrectArgsException,
+            UnstagedChangesException, IOException {
+        RepoImpl repo = new RepoImpl(INIT_ARGS, path);
+        repo.execute();
+        fileSystem = repo.getFileSystem();
+    }
+
+    private void checkIndex(List<Path> paths, List<String> hashes) throws IOException {
+        Pair<List<String>, List<String>> indexContent = fileSystem.splitLines(
+                fileSystem.getIndexLocation());
+        List<String> indexedFiles = indexContent.getKey();
+        List<String> indexedHashes = indexContent.getValue();
+        for (int i = 0; i < paths.size(); i++) {
+            assertEquals(paths.get(i).toString(), indexedFiles.get(i));
+            assertEquals(hashes.get(i), indexedHashes.get(i));
+        }
+    }
+
+    private String hashFile(Path path) throws IOException {
+        return Blob.buildBlob(fileSystem, path).getHash();
+    }
+
+    private void initForMockTests() throws Exception {
+        RepoImpl repo = new RepoImpl(INIT_ARGS, globalRoot);
+        repo.execute();
+        fileSystem = spy(repo.getFileSystem());
+        when(fileSystem.getFolderContent(fileSystem.getRefsLocation()))
+                .thenReturn(new ArrayList<>(Arrays.asList("master", "a", "b")));
+        Head head = mock(Head.class);
+        when(head.getCurrentBranchName()).thenReturn("a");
+        whenNew(Head.class).withArguments(any()).thenReturn(head);
+    }
+
+    @Test
+    public void branchListMockTest() throws Exception {
+        initForMockTests();
+        BranchListCommand branchListCommand = new BranchListCommand(fileSystem);
+        branchListCommand.run();
+        assertEquals(" *a\n  b\n  master\n", branchListCommand.getBranchList());
+    }
+
+    @Test
+    public void checkoutByCurrentBranchMockTest() throws Exception {
+        initForMockTests();
+        CheckoutByBranchCommand checkoutByBranchCommand
+                = new CheckoutByBranchCommand(fileSystem, "a");
         try {
-            VCS.init();
-            List<Path> filesToAdd = FILE_PATHS.subList(0, 2);
-            for (int i = 0; i < 2; i++) {
-                Files.createDirectories(FILE_PATHS.get(i).getParent());
-                Files.createFile(FILE_PATHS.get(i));
-                Files.write(FILE_PATHS.get(i), FILE_CONTENTS.get(i));
-            }
-            VCS.add(filesToAdd);
-            for (int i = 0; i < 2; i++) {
-                assertTrue(indexContains(FILE_PATHS.get(i).toAbsolutePath()));
-            }
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
-            FileUtils.deleteDirectory(TESTDIR_AS_FILE);
+            checkoutByBranchCommand.run();
+        } catch (IncorrectArgsException e) {
+            assertEquals(Messages.THIS_IS_THE_CURRENT_BRANCH, e.getMessage());
         }
     }
 
     @Test
-    public void createAndCheckoutBranchTest() throws GitAlreadyInitedException, GitInitException, IOException,
-            NothingChangedSinceLastAddException, NoIndexFoundException, IndexReadException, AddException,
-            FileToAddNotExistsException, NoGitFoundException, BranchReadException, LogWriteException, BranchWriteException,
-            BranchAlreadyCreatedException, HeadReadException, NoBranchFoundException, TreeReadException, ContentReadException,
-            HeadWriteException, ContentWriteException, DirectoryCreateException {
+    public void checkoutByNonExistingBranchMockTest() throws Exception {
+        initForMockTests();
+        CheckoutByBranchCommand checkoutByBranchCommand
+                = new CheckoutByBranchCommand(fileSystem, "abracadabra");
         try {
-            VCS.init();
-            List<String> branchNamesList = VCS.buildBranchNamesList();
-            assertEquals(1, branchNamesList.size());
-            assertTrue(branchNamesList.contains("* master"));
-            String branchName = "newSupaBranch";
-            VCS.createBranch(branchName);
-            VCS.checkout(branchName);
-            branchNamesList = VCS.buildBranchNamesList();
-            assertEquals(2, branchNamesList.size());
-            assertTrue(branchNamesList.contains("* " + branchName));
-            assertTrue(branchNamesList.contains(" master"));
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
-            FileUtils.deleteDirectory(TESTDIR_AS_FILE);
+            checkoutByBranchCommand.run();
+        } catch (IncorrectArgsException e) {
+            assertEquals(Messages.BRANCH_DOESN_T_EXIST, e.getMessage());
         }
     }
 
     @Test
-    public void switchToBranchTest() throws IOException, GitAlreadyInitedException, GitInitException, NothingChangedSinceLastAddException,
-            NoIndexFoundException, IndexReadException, AddException, FileToAddNotExistsException, NoGitFoundException,
-            BranchReadException, HeadReadException, ContentReadException, NothingChangedSinceLastCommitException,
-            ContentWriteException, LogWriteException, BranchWriteException, BranchAlreadyCreatedException, NoBranchFoundException,
-            DirectoryCreateException, TreeReadException, HeadWriteException {
+    public void deleteCurrentBranchMockTest() throws Exception {
+        initForMockTests();
+        Branch branch = mock(Branch.class);
+        when(branch.notExists()).thenReturn(false);
+        when(branch.getBranchName()).thenReturn("a");
+        whenNew(Branch.class).withArguments(fileSystem, "a").thenReturn(branch);
+        Log log = mock(Log.class);
+        whenNew(Log.class).withArguments(fileSystem, "a").thenReturn(log);
+        doNothing().when(log).delete();
+        BranchDeleteCommand branchDeleteCommand = new BranchDeleteCommand(fileSystem, "a");
         try {
-            VCS.init();
-            Files.createDirectories(FILE_PATHS.get(0).getParent());
-            Files.createFile(FILE_PATHS.get(0));
-            Files.write(FILE_PATHS.get(0), FILE_CONTENTS.get(0));
-            VCS.add(Collections.singletonList(FILE_PATHS.get(0)));
-            VCS.commit("commit");
-            VCS.createBranch("another");
-            VCS.checkout("another");
-            Files.write(FILE_PATHS.get(0), NEW_FILE_CONTENTS.get(0));
-            VCS.add(Collections.singletonList(FILE_PATHS.get(0)));
-            VCS.commit("another commit");
-            VCS.checkout("master");
-            assertTrue(Files.exists(FILE_PATHS.get(0)));
-            assertTrue(Arrays.equals(Files.readAllBytes(FILE_PATHS.get(0)), FILE_CONTENTS.get(0)));
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
-            FileUtils.deleteDirectory(TESTDIR_AS_FILE);
+            branchDeleteCommand.run();
+        } catch (IncorrectArgsException e) {
+            assertEquals(Messages.THIS_IS_THE_CURRENT_BRANCH, e.getMessage());
         }
-    }
-
-    @Test
-    public void switchToCommitTest() throws GitAlreadyInitedException, GitInitException, IOException, NothingChangedSinceLastAddException,
-            NoIndexFoundException, IndexReadException, AddException, FileToAddNotExistsException, NoGitFoundException,
-            BranchReadException, HeadReadException, ContentReadException, NothingChangedSinceLastCommitException,
-            ContentWriteException, LogWriteException, BranchWriteException, BranchAlreadyCreatedException, NoBranchFoundException,
-            DirectoryCreateException, TreeReadException, HeadWriteException {
-        try {
-            VCS.init();
-            Files.createDirectories(FILE_PATHS.get(2).getParent());
-            Files.createFile(FILE_PATHS.get(2));
-            Files.write(FILE_PATHS.get(2), FILE_CONTENTS.get(2));
-            VCS.add(Collections.singletonList(FILE_PATHS.get(2)));
-            String commitHash = VCS.commit("commit");
-            Files.write(FILE_PATHS.get(2), NEW_FILE_CONTENTS.get(2));
-            VCS.add(Collections.singletonList(FILE_PATHS.get(2)));
-            VCS.commit("another commit");
-            VCS.checkout(commitHash);
-            assertTrue(Files.exists(FILE_PATHS.get(2)));
-            assertTrue(Arrays.equals(Files.readAllBytes(FILE_PATHS.get(2)), FILE_CONTENTS.get(2)));
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
-            FileUtils.deleteDirectory(TESTDIR_AS_FILE);
-        }
-
-    }
-
-    @Test
-    public void mergeTest() throws GitAlreadyInitedException, GitInitException, IOException, NothingChangedSinceLastAddException,
-            NoIndexFoundException, IndexReadException, AddException, FileToAddNotExistsException, NoGitFoundException,
-            BranchReadException, HeadReadException, ContentReadException, NothingChangedSinceLastCommitException,
-            ContentWriteException, LogWriteException, BranchWriteException, BranchAlreadyCreatedException, NoBranchFoundException,
-            DirectoryCreateException, TreeReadException, HeadWriteException {
-        try {
-            VCS.init();
-            for (int i = 0; i < 3; i++) {
-                Files.createDirectories(FILE_PATHS.get(i).getParent());
-                Files.createFile(FILE_PATHS.get(i));
-                Files.write(FILE_PATHS.get(i), FILE_CONTENTS.get(i));
-            }
-            VCS.add(FILE_PATHS);
-            VCS.commit("commit 3 files");
-            VCS.createBranch("another");
-            VCS.checkout("another");
-            Files.write(FILE_PATHS.get(2), NEW_FILE_CONTENTS.get(2));
-            VCS.add(Collections.singletonList(FILE_PATHS.get(2)));
-            VCS.commit("3rd file changed");
-            VCS.checkout("master");
-            VCS.merge("another");
-            assertTrue(Arrays.equals(Files.readAllBytes(FILE_PATHS.get(0)), FILE_CONTENTS.get(0)));
-            assertTrue(Arrays.equals(Files.readAllBytes(FILE_PATHS.get(1)), FILE_CONTENTS.get(1)));
-            assertTrue(Arrays.equals(Files.readAllBytes(FILE_PATHS.get(2)), NEW_FILE_CONTENTS.get(2)));
-        } finally {
-            FileUtils.deleteDirectory(GIT_FOLDER_AS_FILE);
-            FileUtils.deleteDirectory(TESTDIR_AS_FILE);
-        }
-    }
-
-    private boolean indexContains(Path path) throws IOException {
-        List<String> indexContent = Files.readAllLines(INDEX_LOCATION);
-        for (String s : indexContent){
-            if (s.equals(path.toString())){
-                return true;
-            }
-        }
-        return false;
     }
 
 }
