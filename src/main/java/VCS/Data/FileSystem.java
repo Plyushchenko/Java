@@ -185,6 +185,9 @@ public abstract class FileSystem {
     @NotNull
     public abstract List<Path> getFolderContent(@NotNull Path path) throws IOException;
 
+    @NotNull
+    public abstract List<String> getFolderContentAsListOfString(@NotNull Path path) throws IOException;
+
     public abstract void restoreFiles(@NotNull Pair<List<String>, List<String>> content)
             throws IOException;
 
@@ -206,4 +209,5 @@ public abstract class FileSystem {
     public Path getLoggerLocation() {
         return loggerLocation;
     }
+
 }

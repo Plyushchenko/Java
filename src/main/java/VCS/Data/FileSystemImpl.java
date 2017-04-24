@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -116,6 +117,20 @@ public class FileSystemImpl extends FileSystem {
                 .map(File::toPath)
                 .collect(Collectors.toList());
     }
+
+    @NotNull
+    @Override
+    public List<String> getFolderContentAsListOfString(@NotNull Path path) throws IOException {
+        List <String> res = new ArrayList<>();
+        File[] files = path.toFile().listFiles();
+        if (files != null) {
+            for (File file : files) {
+                res.add(file.getName());
+            }
+        }
+        return res;
+    }
+
 
     @Override
     public void restoreFiles(@NotNull Pair<List<String>, List<String>> content) throws IOException {

@@ -428,11 +428,8 @@ public class VCSTests {
         fileSystem = spy(new FileSystemImpl(globalRoot));
         logger = mock(Logger.class);
         doNothing().when(logger).trace(anyString());
-        when(fileSystem.getFolderContent(fileSystem.getRefsLocation()))
-                .thenReturn(new ArrayList<>(Arrays.asList(
-                        Paths.get("a" + File.separator + "master"),
-                        Paths.get("a" + File.separator + "a"),
-                        Paths.get("a" + File.separator + "b"))));
+        when(fileSystem.getFolderContentAsListOfString(fileSystem.getRefsLocation()))
+                .thenReturn(new ArrayList<>(Arrays.asList("master", "a", "b")));
         Head head = mock(Head.class);
         when(head.getCurrentBranchName()).thenReturn("a");
         whenNew(Head.class).withArguments(any()).thenReturn(head);

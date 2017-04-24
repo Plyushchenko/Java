@@ -39,11 +39,7 @@ public class BranchListCommand extends Command {
     public void run() throws IncorrectArgsException, IOException {
         logger.info("begin: BranchListCommand.run()");
         String currentBranchName = new Head(fileSystem).getCurrentBranchName();
-        List<String> refs = fileSystem.getFolderContent(fileSystem.getRefsLocation())
-                .stream()
-                .map(Path::getFileName)
-                .map(Path::toString)
-                .collect(Collectors.toList());
+        List<String> refs = fileSystem.getFolderContentAsListOfString(fileSystem.getRefsLocation());
         Collections.sort(refs);
         for (String ref : refs) {
             if (ref.equals(currentBranchName)) {
