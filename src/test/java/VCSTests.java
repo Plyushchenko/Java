@@ -1,14 +1,26 @@
+import VCS.Commands.BranchCommands.BranchDeleteCommand;
+import VCS.Commands.BranchCommands.BranchListCommand;
+import VCS.Commands.CheckoutCommands.CheckoutByBranchCommand;
+import VCS.Commands.LogCommand;
 import VCS.Data.FileSystem;
+import VCS.Data.FileSystemImpl;
+import VCS.Data.LoggerBuilder;
 import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.Messages;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
+import VCS.Objects.Branch;
 import VCS.Objects.GitObjects.Blob;
 import VCS.Objects.Head;
+import VCS.Objects.Log;
 import VCS.RepoImpl;
 import javafx.util.Pair;
+import org.apache.logging.log4j.core.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +33,13 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.powermock.api.mockito.PowerMockito.*;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({BranchListCommand.class, LogCommand.class, CheckoutByBranchCommand.class,
+        BranchDeleteCommand.class, LoggerBuilder.class, RepoImpl.class})
 public class VCSTests {
     private static final List<String> FILE_CONTENTS = new ArrayList<>(Arrays.asList(
             "this\nis\na\ncontent\nof\nfile",
@@ -43,6 +61,7 @@ public class VCSTests {
     private Path globalRoot;
     private FileSystem fileSystem;
     private List<String> hashes;
+    private Logger logger;
 
     @Before()
     public void before() throws IOException {
@@ -402,6 +421,71 @@ public class VCSTests {
 
     private String hashFile(Path path) throws IOException {
         return Blob.buildBlob(fileSystem, path).getHash();
+    }
+
+
+    private void initForMockTests() throws Exception {
+        fileSystem = spy(new FileSystemImpl(globalRoot));
+        logger = mock(Logger.class);
+        doNothing().when(logger).trace(anyString());
+        when(fileSystem.getFolderContent(fileSystem.getRefsLocation()))
+                .thenReturn(new ArrayList<>(Arrays.asList(
+                        Paths.get("master"),
+                        Paths.get("a"),
+                        Paths.get("b"))));
+        Head head = mock(Head.class);
+        when(head.getCurrentBranchName()).thenReturn("a");
+        whenNew(Head.class).withArguments(any()).thenReturn(head);
+    }
+
+    @Test
+    public void branchListMockTest() throws Exception {
+        initForMockTests();
+        BranchListCommand branchListCommand = new BranchListCommand(fileSystem, logger);
+        branchListCommand.run();
+        assertEquals(" *a\n  b\n  master\n", branchListCommand.getBranchList());
+    }
+
+    @Test
+    public void checkoutByCurrentBranchMockTest() throws Exception {
+        initForMockTests();
+        CheckoutByBranchCommand checkoutByBranchCommand
+                = new CheckoutByBranchCommand(fileSystem, logger, "a");
+        try {
+            checkoutByBranchCommand.run();
+        } catch (IncorrectArgsException e) {
+            assertEquals(Messages.THIS_IS_THE_CURRENT_BRANCH, e.getMessage());
+        }
+    }
+
+    @Test
+    public void checkoutByNonExistingBranchMockTest() throws Exception {
+        initForMockTests();
+        CheckoutByBranchCommand checkoutByBranchCommand
+                = new CheckoutByBranchCommand(fileSystem, logger, "abracadabra");
+        try {
+            checkoutByBranchCommand.run();
+        } catch (IncorrectArgsException e) {
+            assertEquals(Messages.BRANCH_DOESN_T_EXIST, e.getMessage());
+        }
+    }
+
+    @Test
+    public void deleteCurrentBranchMockTest() throws Exception {
+        initForMockTests();
+        Branch branch = mock(Branch.class);
+        when(branch.notExists()).thenReturn(false);
+        when(branch.getBranchName()).thenReturn("a");
+        whenNew(Branch.class).withArguments(fileSystem, "a").thenReturn(branch);
+        Log log = mock(Log.class);
+        whenNew(Log.class).withArguments(fileSystem, "a").thenReturn(log);
+        doNothing().when(log).delete();
+        BranchDeleteCommand branchDeleteCommand = new BranchDeleteCommand(fileSystem, logger, "a");
+        try {
+            branchDeleteCommand.run();
+        } catch (IncorrectArgsException e) {
+            assertEquals(Messages.THIS_IS_THE_CURRENT_BRANCH, e.getMessage());
+        }
     }
 
 }

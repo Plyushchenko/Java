@@ -14,13 +14,9 @@ import java.nio.file.Paths;
 public class LoggerBuilder {
 
     @NotNull
-    public static Logger buildLogger(@NotNull FileSystem fileSystem) {
+    public static Logger buildLogger(@NotNull FileSystem fileSystem) throws IOException {
         Path path = fileSystem.getLoggerLocation();
-        try {
-            fileSystem.createDirectory(path);
-        } catch (IOException e) {
-            //ignore
-        }
+        fileSystem.createDirectory(path);
         final ConfigurationBuilder<BuiltConfiguration> builder =
                 ConfigurationBuilderFactory.newConfigurationBuilder();
         builder.setConfigurationName("Logger");
