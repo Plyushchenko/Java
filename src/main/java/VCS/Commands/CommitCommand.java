@@ -1,5 +1,6 @@
 package VCS.Commands;
 
+import VCS.Exceptions.Messages;
 import javafx.util.Pair;
 import VCS.Data.FileSystem;
 import VCS.Exceptions.IncorrectArgsException;
@@ -71,7 +72,11 @@ public class CommitCommand extends Command {
     }
 
     @Override
-    protected void checkArgsCorrectness() throws IncorrectArgsException {}
+    protected void checkArgsCorrectness() throws IncorrectArgsException {
+        if (fileSystem.notExists(fileSystem.buildObjectLocation(commitHash))) {
+            throw new IncorrectArgsException(Messages.COMMIT_DOESN_T_EXIST);
+        }
+    }
 
     @NotNull
     public String getCommitHash() {

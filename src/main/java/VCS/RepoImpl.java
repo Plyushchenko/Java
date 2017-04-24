@@ -31,7 +31,7 @@ public class RepoImpl implements Repo {
     @NotNull private FileSystem fileSystem;
     @NotNull private Logger logger;
 
-    public RepoImpl(@NotNull String[] args, @NotNull Path workingDirectory) {
+    public RepoImpl(@NotNull String[] args, @NotNull Path workingDirectory) throws IOException {
         parser = new Parser(args);
         this.workingDirectory = workingDirectory;
         fileSystem = new FileSystemImpl(workingDirectory);
@@ -91,7 +91,7 @@ public class RepoImpl implements Repo {
     }
 
     /**
-     * Execute 'git add ...'
+     * Execute 'mygit add ...'
      * @param args File1, file2, ..., fileN
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
@@ -106,7 +106,7 @@ public class RepoImpl implements Repo {
     }
 
     /**
-     * Execute 'git branch ...'.
+     * Execute 'mygit branch ...'.
      * <pre>
      * git branch: build branch list (as String)
      * git branch branchName: create 'branchName' branch
@@ -151,7 +151,7 @@ public class RepoImpl implements Repo {
     }
 
     /**
-     * Execute 'git checkout ...'
+     * Execute 'mygit checkout ...'
      * <pre>
      * git checkout branchName: switch to 'branchName' branch
      * git checkout -b branchName: create 'branchName' branch and switch to it
@@ -201,7 +201,7 @@ public class RepoImpl implements Repo {
         return "cleaned";
     }
     /**
-     * Execute 'git commit ...'
+     * Execute 'mygit commit ...'
      * @param message -m, commit message
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
@@ -219,7 +219,7 @@ public class RepoImpl implements Repo {
     }
 
     /**
-     * Execute 'git init'
+     * Execute 'mygit init'
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      * @throws UnstagedChangesException Changes were not staged
@@ -237,7 +237,7 @@ public class RepoImpl implements Repo {
     }
 
     /**
-     * Execute 'git log'
+     * Execute 'mygit log'
      * @throws IOException Unknown IO problem
      */
     @NotNull
@@ -251,7 +251,7 @@ public class RepoImpl implements Repo {
     }
 
     /**
-     * Execute 'git merge ...'.
+     * Execute 'mygit merge ...'.
      * Merge 'branchName' branch into current branch.
      * @param branchName Branch name
      * @throws IncorrectArgsException Incorrect args passed
