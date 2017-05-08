@@ -11,10 +11,10 @@ import java.util.Arrays;
 //TODO документация
 public class ChannelByteReader {
 
-    @NotNull private final static int BUFFER_SIZE = 4096;
+    private final static int BUFFER_SIZE = 4096;
     @NotNull private final ByteBuffer buffer;
     @NotNull private byte[] data;
-    @NotNull private int position;
+    private int position;
 
     public ChannelByteReader() {
         this.buffer = ByteBuffer.allocate(BUFFER_SIZE);

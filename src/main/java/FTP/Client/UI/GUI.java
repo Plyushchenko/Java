@@ -14,22 +14,42 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
+/** GUI*/
 public class GUI extends Application {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(@NotNull String[] args) throws IOException {
         Application.launch(args);
     }
 
+    /**
+     * Setup everything.
+     * <pre>
+     * How-to.
+     * Starting from current folder
+     * Double click on row:
+     * list <- table row with folder
+     * get <- table row with file
+     * Button pressing:
+     * list <- 'List' button
+     * get <- 'Get' button
+     * go to parent folder (or do nothing if current folder is root folder) <- '..' button
+     * Alert window (error/information types)
+     * </pre>
+     * @param primaryStage Stage
+     */
     @Override
-    public void start(@NotNull Stage primaryStage) throws IOException {
+    public void start(@NotNull Stage primaryStage) {
         primaryStage.setTitle("FTP");
         Label label = new Label("Enter path:");
         TextField pathTextField = new TextField();
@@ -41,6 +61,7 @@ public class GUI extends Application {
         goToParentButton.prefWidthProperty().bind(primaryStage.widthProperty().multiply(1 / 7.));
         TableView<ListCommandRespond> tableView = setupTableView();
         tableView.prefHeightProperty().bind(primaryStage.heightProperty().multiply(9 / 10.));
+        //Effectively final trick, sorry
         final Path[] currentPath = new Path[]{Paths.get("").toAbsolutePath()};
         getButton.setOnAction(action -> {
             try {
@@ -51,14 +72,11 @@ public class GUI extends Application {
         });
         listButton.setOnAction(action -> {
             try {
-                System.out.println("currentPath = " + currentPath[0]);
                 boolean isZeroSize = executeList(pathTextField.getText(), tableView);
                 if (!isZeroSize) {
                     currentPath[0] = Paths.get(pathTextField.getText()).toAbsolutePath();
                     pathTextField.setText(currentPath[0].toString());
                 }
-                System.out.println("currentPath = " + currentPath[0]);
-
             } catch (Exception e) {
                 showAlert(e);
             }
@@ -77,7 +95,7 @@ public class GUI extends Application {
                 showAlert(e);
             }
         });
-        tableView.setRowFactory( tv -> {
+        tableView.setRowFactory(tv -> {
             TableRow<ListCommandRespond> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 try {
@@ -98,8 +116,9 @@ public class GUI extends Application {
                     showAlert(e);
                 }
             });
-            return row ;
+            return row;
         });
+        listButton.fire();
         HBox hbox = new HBox(getButton, listButton, goToParentButton);
         VBox vbox = new VBox(label, pathTextField, hbox, tableView);
         Scene scene = new Scene(vbox, 300, 600);
@@ -107,16 +126,15 @@ public class GUI extends Application {
         primaryStage.show();
     }
 
-    private boolean executeList(String path, TableView<ListCommandRespond> tableView)
+    private boolean executeList(@NotNull String path,
+                                @NotNull TableView<ListCommandRespond> tableView)
             throws IOException, IncorrectArgsException {
-        System.out.println(Paths.get(path).toAbsolutePath().toString());
         String folderContent = new ClientImpl().execute(new String[]{
                 "list", Paths.get(path).toAbsolutePath().toString()});
-
         ObservableList<ListCommandRespond> data = FXCollections.observableArrayList();
         String[] tmp = folderContent.split("\n");
         for (int i = 2; i < tmp.length; i++) {
-            if (tmp[i].endsWith(" true")) {
+            if (tmp[i].endsWith("true")) {
                 data.add(new ListCommandRespond(
                         tmp[i].substring(0, tmp[i].length() - 5), "Folder"));
             } else {
@@ -133,18 +151,24 @@ public class GUI extends Application {
         }
     }
 
-    private void executeGet(String path) throws IOException, IncorrectArgsException {
-        System.out.println(Paths.get(path).toAbsolutePath().toString());
+    private void executeGet(@NotNull String path) throws IOException, IncorrectArgsException {
         String[] response = new ClientImpl().execute(new String[]{
                 "get", Paths.get(path).toAbsolutePath().toString()}).split("\n");
         showAlert(INFORMATION, response[response.length - 1]);
     }
 
-    private void showAlert(Alert.AlertType alertType, String s) {
+    private void showAlert(@NotNull Alert.AlertType alertType, @NotNull String s) {
         showAlert(alertType, null, s);
     }
 
-    private void showAlert(Alert.AlertType alertType, String header, String s) {
+    private void showAlert(@NotNull Exception e) {
+        StringWriter errors = new StringWriter();
+        e.printStackTrace(new PrintWriter(errors));
+        showAlert(ERROR, e.getMessage(), errors.toString());
+    }
+
+    private void showAlert(@NotNull Alert.AlertType alertType, @Nullable String header,
+                           @Nullable String s) {
         Alert alert = new Alert(alertType);
         alert.setTitle(null);
         alert.setHeaderText(header);
@@ -154,11 +178,7 @@ public class GUI extends Application {
         alert.showAndWait();
     }
 
-    private void showAlert(Exception e) {
-        e.printStackTrace();
-        showAlert(ERROR, e.getMessage(), null);
-    }
-
+    @NotNull
     private TableView<ListCommandRespond> setupTableView() {
         TableView<ListCommandRespond> tableView = new TableView<>();
         TableColumn<ListCommandRespond, String> pathTableColumn = new TableColumn<>("Path");
@@ -179,19 +199,19 @@ public class GUI extends Application {
 
 class ListCommandRespond {
 
-    private final SimpleStringProperty path;
-    private final SimpleStringProperty type;
+    @NotNull private final SimpleStringProperty path;
+    @NotNull private final SimpleStringProperty type;
 
-    ListCommandRespond(String path, String type) {
+    ListCommandRespond(@NotNull String path, @NotNull String type) {
         this.path = new SimpleStringProperty(path);
         this.type = new SimpleStringProperty(type);
     }
 
-    String getPath() {
+    @NotNull String getPath() {
         return path.get();
     }
 
-    String getType() {
+    @NotNull String getType() {
         return type.get();
     }
 

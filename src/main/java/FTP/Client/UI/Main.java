@@ -19,12 +19,10 @@ public class Main {
                         }
                     } catch (Exception e) {
                         System.out.println("message = " + e.getMessage());
-                        e.printStackTrace();
                     }
                 }
             } catch (IOException e) {
                 System.out.println("message = " + e.getMessage());
-                e.printStackTrace();
             }
         }
     }

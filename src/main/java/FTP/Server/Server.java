@@ -21,7 +21,7 @@ public interface Server {
      * @throws IOException Unknown IO problem
      */
     @NotNull
-    String execute(String[] args) throws IncorrectArgsException, IOException;
+    String execute(@NotNull String[] args) throws IncorrectArgsException, IOException;
 
     /**
      * Start listening on server side

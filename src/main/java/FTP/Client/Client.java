@@ -1,6 +1,7 @@
 package FTP.Client;
 
 import FTP.Exceptions.IncorrectArgsException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,9 +12,10 @@ import java.nio.file.Paths;
 /** Client*/
 public interface Client {
 
-    InetSocketAddress SERVER_ADDRESS = new InetSocketAddress(
+    @NotNull InetSocketAddress SERVER_ADDRESS = new InetSocketAddress(
             InetAddress.getLoopbackAddress(), 12345);
-    Path FOLDER_WITH_SAVED_FILES = Paths.get(System.getProperty("user.home"), ".ftp");
+    @NotNull Path DEFAULT_FOLDER_WITH_SAVED_FILES =
+            Paths.get(System.getProperty("user.home"), "" + ".ftp");
 
     /**
      * Choose and execute command
@@ -22,7 +24,7 @@ public interface Client {
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      */
-    String execute(String[] args) throws IncorrectArgsException, IOException;
+    @NotNull String execute(@NotNull String[] args) throws IncorrectArgsException, IOException;
 
     /**
      * Connect to server
@@ -41,13 +43,13 @@ public interface Client {
      * @return Server response
      * @throws IOException Unknown IO problem
      */
-    String executeList() throws IOException;
+    @NotNull String executeList() throws IOException;
 
     /**
      * Execute 'get' command
      * @return Server response
      * @throws IOException Unknown IO problem
      */
-    String executeGet() throws IOException;
+    @NotNull String executeGet() throws IOException;
 
 }

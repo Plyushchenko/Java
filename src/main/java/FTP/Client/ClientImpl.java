@@ -5,25 +5,34 @@ import FTP.Client.Commands.ListCommand;
 import FTP.Client.Commands.QuitCommand;
 import FTP.ClientCommand;
 import FTP.Exceptions.IncorrectArgsException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 /** Client implementation*/
 public class ClientImpl implements Client {
 
     private SocketChannel socketChannel;
+    private Selector selector;
     private String[] args;
+    @NotNull private final Path folderWithSavedFiles;
 
     public ClientImpl() throws IOException {
-        System.out.println("!!!!");
-        if (Files.exists(Client.FOLDER_WITH_SAVED_FILES)) {
+        this(DEFAULT_FOLDER_WITH_SAVED_FILES);
+    }
+
+    public ClientImpl(@NotNull Path folderWithSavedFiles) throws IOException {
+        this.folderWithSavedFiles = folderWithSavedFiles;
+        if (Files.exists(folderWithSavedFiles)) {
             return;
         }
-        Files.createDirectories(Client.FOLDER_WITH_SAVED_FILES);
+        Files.createDirectories(folderWithSavedFiles);
     }
 
     /**
@@ -33,8 +42,9 @@ public class ClientImpl implements Client {
      * @throws IncorrectArgsException Incorrect args passed
      * @throws IOException Unknown IO problem
      */
+    @NotNull
     @Override
-    public String execute(String[] args) throws IncorrectArgsException, IOException {
+    public String execute(@NotNull String[] args) throws IncorrectArgsException, IOException {
         Parser parser = new Parser(args);
         try {
             ClientCommand principleCommand = ClientCommand.valueOf(
@@ -51,7 +61,6 @@ public class ClientImpl implements Client {
                     parser.checkQuitArgsFormatCorrectness();
                     return executeQuit();
                 default:
-                    System.out.println("???");
                     throw new IncorrectArgsException("no such command");
             }
         } catch (IllegalArgumentException e) {
@@ -69,7 +78,7 @@ public class ClientImpl implements Client {
     public void connect() throws IOException {
         socketChannel = SocketChannel.open();
         socketChannel.configureBlocking(false);
-        Selector selector = Selector.open();
+        selector = Selector.open();
         socketChannel.register(selector, SelectionKey.OP_CONNECT);
         try {
             socketChannel.connect(SERVER_ADDRESS);
@@ -77,8 +86,7 @@ public class ClientImpl implements Client {
                 throw new Exception();
             }
         } catch (Exception e) {
-            selector.close();
-            socketChannel.close();
+            disconnect();
             throw new IOException("Server is off or is stopped");
         }
     }
@@ -89,6 +97,7 @@ public class ClientImpl implements Client {
      */
     @Override
     public void disconnect() throws IOException {
+        selector.close();
         socketChannel.close();
     }
 
@@ -97,10 +106,11 @@ public class ClientImpl implements Client {
      * @return Server response
      * @throws IOException Unknown IO problem
      */
+    @NotNull
     @Override
     public String executeGet() throws IOException {
         connect();
-        GetCommand getCommand = new GetCommand(socketChannel, args);
+        GetCommand getCommand = new GetCommand(socketChannel, args, folderWithSavedFiles);
         getCommand.run();
         String response = getCommand.receiveResponse();
         disconnect();
@@ -112,6 +122,7 @@ public class ClientImpl implements Client {
      * @return Server response
      * @throws IOException Unknown IO problem
      */
+    @NotNull
     @Override
     public String executeList() throws IOException {
         connect();
@@ -119,14 +130,12 @@ public class ClientImpl implements Client {
         listCommand.run();
         String response = listCommand.receiveResponse();
         disconnect();
-        System.out.println("response = " + response);
         return response;
     }
 
     /**
      * Run command
      * @return Command response
-     * @throws IOException Unknown IO problem
      */
     private String executeQuit() {
         QuitCommand quitCommand = new QuitCommand();

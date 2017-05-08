@@ -1,6 +1,7 @@
 package FTP.Server.Commands;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ public interface ClientCommandOnServerSide {
      */
     void run() throws IOException;
 
-    @NotNull
+    @Nullable
     byte[] getResponse();
 
 }

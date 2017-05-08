@@ -1,19 +1,23 @@
 package FTP.Server.Commands;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** Stop command*/
 public class StopCommand implements Command {
 
-    @NotNull private final StartCommand startCommand;
+    @Nullable private final StartCommand startCommand;
 
-    public StopCommand(@NotNull StartCommand startCommand) {
+    public StopCommand(@Nullable StartCommand startCommand) {
         this.startCommand = startCommand;
     }
 
     /** Unset 'isRunning' flag*/
     @Override
     public void run() {
+        if (startCommand == null) {
+            return;
+        }
         startCommand.unsetIsRunning();
     }
 

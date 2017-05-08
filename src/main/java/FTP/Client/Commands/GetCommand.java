@@ -1,6 +1,5 @@
 package FTP.Client.Commands;
 
-import FTP.Client.Client;
 import FTP.Data.ChannelByteReader;
 import FTP.Data.Utils;
 import org.jetbrains.annotations.NotNull;
@@ -16,12 +15,15 @@ import java.nio.file.Paths;
 /** Get command*/
 public class GetCommand implements Command {
 
-    private final SocketChannel socketChannel;
-    private final String[] args;
+    @NotNull private final SocketChannel socketChannel;
+    @NotNull private final String[] args;
+    @NotNull private final Path folderWithSavedFiles;
 
-    public GetCommand(SocketChannel socketChannel, String[] args) {
+    public GetCommand(@NotNull SocketChannel socketChannel, @NotNull String[] args,
+                      @NotNull Path folderWithSavedFiles) {
         this.socketChannel = socketChannel;
         this.args = args;
+        this.folderWithSavedFiles = folderWithSavedFiles;
     }
 
     /**
@@ -46,15 +48,14 @@ public class GetCommand implements Command {
         try (ByteArrayInputStream bs = new ByteArrayInputStream(responseAsByteArray);
              DataInputStream is =  new DataInputStream(bs)) {
             long size = is.readLong();
-            System.out.println("size = " + size);
             if (size == 0) {
                 return "No such file";
             }
             response += String.valueOf(size);
-            response += "\nwrote to " + Client.FOLDER_WITH_SAVED_FILES + "\n";
             Path path = Paths.get(
-                    Client.FOLDER_WITH_SAVED_FILES.toString(),
+                    folderWithSavedFiles.toString(),
                     Paths.get(args[1]).getFileName().toString());
+            response += "\nWrote to " + path;
             Files.deleteIfExists(path);
             Files.createFile(path);
             byte[] buffer = new byte[is.available()];
@@ -64,5 +65,4 @@ public class GetCommand implements Command {
         }
         return response;
     }
-
 }

@@ -11,7 +11,7 @@ public class ClientParserOnServerSide {
 
     @NotNull private final String[] args;
 
-    public ClientParserOnServerSide(byte[] data) throws IOException {
+    public ClientParserOnServerSide(@NotNull byte[] data) throws IOException {
         args = new String[2];
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(data))) {
             args[0] = String.valueOf(is.readInt());

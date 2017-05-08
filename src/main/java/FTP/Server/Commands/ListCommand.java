@@ -1,6 +1,7 @@
 package FTP.Server.Commands;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -8,22 +9,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /** List command*/
 public class ListCommand implements ClientCommandOnServerSide {
 
-    private final String pathAsString;
-    private byte[] response;
+    @NotNull private final String pathAsString;
+    @Nullable private byte[] response;
 
-    ListCommand(String path) {
+    ListCommand(@NotNull String path) {
         pathAsString = path;
     }
 
     /**
      * Build list of files and directories as byte array
-     * @throws IOException
+     * @throws IOException Unknown IO problem
      */
     @Override
     public void run() throws IOException {
@@ -35,6 +37,7 @@ public class ListCommand implements ClientCommandOnServerSide {
                 shouldSendZero = true;
             } else {
                 paths = Files.list(path).collect(Collectors.toList());
+                Collections.sort(paths);
             }
         } catch (Exception e) {
             shouldSendZero = true;
@@ -45,7 +48,6 @@ public class ListCommand implements ClientCommandOnServerSide {
                 os.writeInt(0);
             } else {
                 os.writeInt(paths.size());
-                System.out.println(paths.size());
                 for (Path path : paths) {
                     os.writeUTF(path.getFileName().toString());
                     os.writeBoolean(Files.isDirectory(path));
@@ -56,8 +58,7 @@ public class ListCommand implements ClientCommandOnServerSide {
         }
     }
 
-
-    @NotNull
+    @Nullable
     @Override
     public byte[] getResponse() {
         return response;

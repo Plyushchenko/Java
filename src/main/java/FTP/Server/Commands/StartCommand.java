@@ -29,15 +29,13 @@ public class StartCommand implements Command {
     @Override
     public void run() {
         Thread thread = new Thread(() -> {
-            try (Selector selector = Selector.open()) {
-                ServerSocketChannel serverChannel = ServerSocketChannel.open();
+            try (Selector selector = Selector.open();
+                 ServerSocketChannel serverChannel = ServerSocketChannel.open()) {
                 serverChannel.bind(socketAddress);
                 serverChannel.configureBlocking(false);
                 serverChannel.register(selector, SelectionKey.OP_ACCEPT);
                 while (isRunning) {
                     selector.select(SELECT_TIMEOUT);
-                    System.out.println("SELECTED");
-
                     Iterator<SelectionKey> selectionKeyIterator =
                             selector.selectedKeys().iterator();
                     while (selectionKeyIterator.hasNext()) {
@@ -55,12 +53,10 @@ public class StartCommand implements Command {
                         }
                         selectionKeyIterator.remove();
                     }
-                    System.out.println("LOOPED");
                 }
-                serverChannel.close();
             } catch (IOException | IncorrectArgsException e) {
                 //TODO Это очень странно
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         });
         thread.start();
@@ -151,7 +147,6 @@ public class StartCommand implements Command {
 
     void unsetIsRunning() {
         isRunning = false;
-
     }
 
     @NotNull

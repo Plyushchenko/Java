@@ -5,6 +5,7 @@ import FTP.Server.Commands.QuitCommand;
 import FTP.Server.Commands.StartCommand;
 import FTP.Server.Commands.StopCommand;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,9 +14,9 @@ import java.net.SocketAddress;
 /** Server implementation*/
 public class ServerImpl implements Server {
 
-    private volatile Boolean isRunning = false;
-    private StartCommand startCommand;
-    private final SocketAddress bindingAddress = new InetSocketAddress(PORT);
+    @NotNull private volatile Boolean isRunning = false;
+    @Nullable private StartCommand startCommand;
+    @NotNull private final SocketAddress bindingAddress = new InetSocketAddress(PORT);
 
     /**
      * Extract principle command and execute it
@@ -26,7 +27,7 @@ public class ServerImpl implements Server {
      */
     @NotNull
     @Override
-    public String execute(String[] args) throws IncorrectArgsException, IOException {
+    public String execute(@NotNull String[] args) throws IncorrectArgsException, IOException {
         Parser parser = new Parser(args);
         Server.ServerCommand principleCommand = Server.ServerCommand.valueOf(
                 parser.getPrincipleCommandAsString().toUpperCase());
@@ -79,6 +80,7 @@ public class ServerImpl implements Server {
         return stopCommand.getResponse();
     }
 
+    @NotNull
     private String executeQuit() {
         stop();
         QuitCommand quitCommand = new QuitCommand();

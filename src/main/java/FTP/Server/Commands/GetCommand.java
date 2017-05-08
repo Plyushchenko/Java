@@ -1,6 +1,7 @@
 package FTP.Server.Commands;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -13,7 +14,7 @@ import java.nio.file.Paths;
 public class GetCommand implements ClientCommandOnServerSide {
 
     @NotNull private final String pathAsString;
-    @NotNull private byte[] response;
+    @Nullable private byte[] response;
 
     GetCommand(@NotNull String path) {
         pathAsString = path;
@@ -50,7 +51,7 @@ public class GetCommand implements ClientCommandOnServerSide {
         }
     }
 
-    @NotNull
+    @Nullable
     @Override
     public byte[] getResponse() {
         return response;

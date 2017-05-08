@@ -12,10 +12,10 @@ import java.nio.channels.SocketChannel;
 /** List command*/
 public class ListCommand implements Command {
 
-    private final SocketChannel socketChannel;
-    private final String[] args;
+    @NotNull private final SocketChannel socketChannel;
+    @NotNull private final String[] args;
 
-    public ListCommand(SocketChannel socketChannel, String[] args) {
+    public ListCommand(@NotNull SocketChannel socketChannel, @NotNull String[] args) {
         this.socketChannel = socketChannel;
         this.args = args;
     }
@@ -37,6 +37,8 @@ public class ListCommand implements Command {
      * name1 is_dir1
      * ...
      * </sup>
+     * Unfortunately, there is no way to see the difference between 'empty folder' and 'no folder'
+     * because of client-server protocol format
      * @return Server response
      * @throws IOException Unknown IO problem
      */
