@@ -75,6 +75,8 @@ public class FtpTests {
     public void stoppedServerTest() {
        try {
            server.execute(new String[]{"start"});
+           //Requires some time to finish server not to wait for exception too long
+           Thread.sleep(2000);
            server.execute(new String[]{"stop"});
            //Requires some time to finish server not to wait for exception too long
            Thread.sleep(2000);
@@ -99,8 +101,10 @@ public class FtpTests {
     }
 
     @Test
-    public void getTest() throws IOException, IncorrectArgsException {
+    public void getTest() throws IOException, IncorrectArgsException, InterruptedException {
         server.execute(new String[]{"start"});
+        //Requires some time to finish server not to wait for exception too long
+        Thread.sleep(2000);
         Client client = new ClientImpl(folderWithSavedFiles);
         for (int i = 0; i < filePaths.size(); i++) {
             client.execute(new String[]{"get", filePaths.get(i).toString()});
@@ -146,8 +150,10 @@ public class FtpTests {
     */
 
     @Test
-    public void listTest() throws IOException, IncorrectArgsException {
+    public void listTest() throws IOException, IncorrectArgsException, InterruptedException {
         server.execute(new String[]{"start"});
+        //Requires some time to finish server not to wait for exception too long
+        Thread.sleep(2000);
         Client client = new ClientImpl(folderWithSavedFiles);
         String response = client.execute(new String[]{"list", folderPaths.get(0).toString()});
         assertEquals("size = 3\n" +
