@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -64,8 +65,10 @@ public class FtpTests {
     }
 
     @After
-    public void after() throws IOException, IncorrectArgsException {
+    public void after() throws IOException, IncorrectArgsException, InterruptedException {
         server.execute(new String[]{"quit"});
+        //Requires some time to finish server not to wait for exception too long
+        Thread.sleep(2000);
     }
 
     @Test
@@ -115,6 +118,32 @@ public class FtpTests {
             assertEquals(response, "No such file");
         }
     }
+
+    /*
+    @Test
+    public void f() {
+        for (Path path : filePaths) {
+            System.out.println(path);
+        }
+        System.out.println();
+        Collections.sort(filePaths);
+        for (Path path : filePaths) {
+            System.out.println(path);
+        }
+        System.out.println();
+        System.out.println();
+        for (Path path : folderPaths) {
+            System.out.println(path);
+        }
+        System.out.println();
+        Collections.sort(folderPaths);
+        for (Path path : folderPaths) {
+            System.out.println(path);
+        }
+        System.out.println();
+
+    }
+    */
 
     @Test
     public void listTest() throws IOException, IncorrectArgsException {
