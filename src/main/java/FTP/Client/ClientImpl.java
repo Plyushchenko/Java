@@ -19,6 +19,7 @@ public class ClientImpl implements Client {
     private String[] args;
 
     public ClientImpl() throws IOException {
+        System.out.println("!!!!");
         if (Files.exists(Client.FOLDER_WITH_SAVED_FILES)) {
             return;
         }
@@ -50,6 +51,7 @@ public class ClientImpl implements Client {
                     parser.checkQuitArgsFormatCorrectness();
                     return executeQuit();
                 default:
+                    System.out.println("???");
                     throw new IncorrectArgsException("no such command");
             }
         } catch (IllegalArgumentException e) {
@@ -117,6 +119,7 @@ public class ClientImpl implements Client {
         listCommand.run();
         String response = listCommand.receiveResponse();
         disconnect();
+        System.out.println("response = " + response);
         return response;
     }
 

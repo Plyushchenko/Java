@@ -48,7 +48,7 @@ public class GetCommand implements Command {
             long size = is.readLong();
             System.out.println("size = " + size);
             if (size == 0) {
-                return "no such file";
+                return "No such file";
             }
             response += String.valueOf(size);
             response += "\nwrote to " + Client.FOLDER_WITH_SAVED_FILES + "\n";
