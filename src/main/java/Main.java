@@ -39,7 +39,9 @@ public class Main extends Application {
             for (int i = 0; i < state.length; i++) {
                 state[i] = "0";
                 pressed[i] = false;
+                buttons[i].setDisable(false);
                 buttons[i].setText("?");
+
             }
             count[0] = 0;
             matched[0] = 0;
@@ -125,7 +127,7 @@ public class Main extends Application {
         for (int i = 0; i < N; i++) {
             rows[i] = new HBox(Arrays.copyOfRange(buttons, i * N, (i + 1) * N ));
         }
-
+        startButton.fire();
         //TODO ??? Надо как-то поаккуратнее массив рядов передавать
         VBox vbox = new VBox(startButton, rows[0], rows[1], rows[2], rows[3]);
         Scene scene = new Scene(vbox, 120, 130);
