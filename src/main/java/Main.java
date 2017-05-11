@@ -1,7 +1,5 @@
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -49,11 +47,11 @@ public class Main extends Application {
             for (int i = 0; i < N * N; i++) {
                 cells.add(i);
             }
-            cells.forEach(x -> System.out.print(x + " "));
-            System.out.println();
+//            cells.forEach(x -> System.out.print(x + " "));
+//            System.out.println();
             Collections.shuffle(cells);
-            cells.forEach(x -> System.out.print(x + " "));
-            System.out.println();
+//            cells.forEach(x -> System.out.print(x + " "));
+//            System.out.println();
 
             for (int i = 0; i < N * N / 2; i++) {
                 state[cells.get(i)] = "1";
@@ -69,7 +67,7 @@ public class Main extends Application {
                 pressed[ii] = true;
                 if (count[0] == 2 && matched[0] == 14) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException e1) {
                         //ignore
                     }
@@ -79,9 +77,9 @@ public class Main extends Application {
                 if (count[0] <= 2) {
                     for (int j = 0; j < pressed.length; j++) {
                         if (pressed[j]) {
-                            System.out.println(j + " is pressed, value = " + state[j]);
+//                            System.out.println(j + " is pressed, value = " + state[j]);
                             buttons[j].setText(state[j]);
-                            System.out.println(buttons[j].getText() + " " + state[j]);
+//                            System.out.println(buttons[j].getText() + " " + state[j]);
                         }
                     }
                 } else {
@@ -105,21 +103,21 @@ public class Main extends Application {
                             continue;
                         }
                         if (pressed[j]) {
-                            System.out.println(j + " is unpressed, value = " + state[j]);
+//                            System.out.println(j + " is unpressed, value = " + state[j]);
                             if (!buttons[pressedButtons.get(0)].getText().equals
                                     (buttons[pressedButtons.get(1)].getText())) {
-                                System.out.println(pressedButtons.get(0));
-                                System.out.println(pressedButtons.get(1));
+//                                System.out.println(pressedButtons.get(0));
+//                                System.out.println(pressedButtons.get(1));
                                 buttons[j].setText("?");
                             }
                             count[0]--;
                             pressed[j] = false;
-                            System.out.println(buttons[j].getText() + " " + state[j]);
+//                            System.out.println(buttons[j].getText() + " " + state[j]);
                         }
                     }
-                    System.out.println(ii + " is pressed, value = " + state[ii]);
+//                    System.out.println(ii + " is pressed, value = " + state[ii]);
                     buttons[ii].setText(state[ii]);
-                    System.out.println(buttons[ii].getText() + " " + state[ii]);
+//                    System.out.println(buttons[ii].getText() + " " + state[ii]);
                 }
             });
         }
