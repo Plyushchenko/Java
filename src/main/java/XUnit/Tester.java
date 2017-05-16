@@ -23,13 +23,23 @@ public class Tester {
     @NotNull private final List<TestReport> testReports;
 
     public Tester(@NotNull String[] args) throws IOException, ClassNotFoundException {
-        classesToTest = new Parser(args).buildListOfClassesToTest();
         beforeClassAnnotatedMethods = new ArrayList<>();
         beforeAnnotatedMethods = new ArrayList<>();
         afterAnnotatedMethods = new ArrayList<>();
         afterClassAnnotatedMethods = new ArrayList<>();
         testsToRunInformation = new ArrayList<>();
         testReports = new ArrayList<>();
+        classesToTest = new Parser(args).buildListOfClassesToTest();
+    }
+
+    public Tester() {
+        beforeClassAnnotatedMethods = new ArrayList<>();
+        beforeAnnotatedMethods = new ArrayList<>();
+        afterAnnotatedMethods = new ArrayList<>();
+        afterClassAnnotatedMethods = new ArrayList<>();
+        testsToRunInformation = new ArrayList<>();
+        testReports = new ArrayList<>();
+        classesToTest = new ArrayList<>();
     }
 
     /**
@@ -39,19 +49,13 @@ public class Tester {
      * For each '@Test' method: run '@Before' methods, run '@Test' method, run '@After' method.
      * Run '@AfterClass' methods.
      * @param classToTest Class to test
-     * @throws ClassNotFoundException Class is not presented in the 'args' folders/jars
-     * @throws IncorrectAnnotationUsage '@Test' was used with '@BeforeClass'/'@Before'/'@After'/'@AfterClass'
      * @throws NoSuchMethodException No default constructor provided
      * @throws IllegalAccessException Some problems with method invocation
      * @throws InvocationTargetException Some problems with method invocation
      * @throws InstantiationException Some problems with instantiation
      */
-    public void test(@NotNull Class classToTest) throws ClassNotFoundException,
-            IncorrectAnnotationUsage, NoSuchMethodException, IllegalAccessException,
-            InvocationTargetException, InstantiationException {
-        if (!classesToTest.contains(classToTest)) {
-            throw new ClassNotFoundException(classToTest.toString());
-        }
+    public void test(@NotNull Class classToTest) throws NoSuchMethodException,
+            IllegalAccessException, InvocationTargetException, InstantiationException {
         boolean haveMethodToTest = prepareForClassTesting(classToTest);
         if (!haveMethodToTest) {
             return;
@@ -74,20 +78,18 @@ public class Tester {
             testReports.add(new TestReport(methodToTest, executionTime, expected, throwable));
             runAll(afterAnnotatedMethods, classToTestInstance);
         }
-        runAll(afterClassAnnotatedMethods, classToTest);
+        runAll(afterClassAnnotatedMethods, classToTestInstance);
     }
 
     /**
-     * Test all the methods in 'args' folders/jars
-     * @throws ClassNotFoundException Class is not presented in the 'args' folders/jars
-     * @throws IncorrectAnnotationUsage '@Test' was used with '@BeforeClass'/'@Before'/'@After'/'@AfterClass'
+     * Test all the methods in 'args' jars
      * @throws NoSuchMethodException No default constructor provided
      * @throws IllegalAccessException Some problems with method invocation
      * @throws InvocationTargetException Some problems with method invocation
      * @throws InstantiationException Some problems with instantiation
      */
-    public void testAll() throws ClassNotFoundException, IncorrectAnnotationUsage,
-            InvocationTargetException, NoSuchMethodException, InstantiationException,
+    public void testAll() throws InvocationTargetException,
+            NoSuchMethodException, InstantiationException,
             IllegalAccessException {
         for (Class classToTest : classesToTest) {
             test(classToTest);
@@ -99,18 +101,6 @@ public class Tester {
         return testReports;
     }
 
-    private void checkAnnotationUsageCorrectness(@NotNull Method method) throws
-            IncorrectAnnotationUsage {
-        boolean haveTestAnnotation = method.isAnnotationPresent(Test.class);
-        boolean haveNotTestAnnotation = method.isAnnotationPresent(BeforeClass.class)
-                || method.isAnnotationPresent(Before.class)
-                || method.isAnnotationPresent(After.class)
-                || method.isAnnotationPresent(AfterClass.class);
-        if (haveTestAnnotation && haveNotTestAnnotation) {
-            throw new IncorrectAnnotationUsage(method.getName());
-        }
-    }
-
     private void clearAll() {
         beforeClassAnnotatedMethods.clear();
         beforeAnnotatedMethods.clear();
@@ -119,13 +109,11 @@ public class Tester {
         testsToRunInformation.clear();
     }
 
-    private boolean prepareForClassTesting(@NotNull Class classToTest) throws
-            IncorrectAnnotationUsage {
+    private boolean prepareForClassTesting(@NotNull Class classToTest) {
         clearAll();
         boolean haveMethodToTest = false;
         Method[] methods = classToTest.getDeclaredMethods();
         for (Method method : methods) {
-            checkAnnotationUsageCorrectness(method);
             if (method.isAnnotationPresent(BeforeClass.class)) {
                 beforeClassAnnotatedMethods.add(method);
             }
