@@ -28,7 +28,7 @@ import static javafx.scene.control.Alert.AlertType.INFORMATION;
 /** GUI*/
 public class GUI extends Application {
 
-    public static void main(@NotNull String[] args) throws IOException {
+    public static void main(@NotNull String[] args) {
         Application.launch(args);
     }
 
@@ -62,7 +62,8 @@ public class GUI extends Application {
         TableView<ListCommandRespond> tableView = setupTableView();
         tableView.prefHeightProperty().bind(primaryStage.heightProperty().multiply(9 / 10.));
         //Effectively final trick, sorry
-        final Path[] currentPath = new Path[]{Paths.get("").toAbsolutePath()};
+        final Path[] currentPath = new Path[]{Paths.get(System.getProperty("user.home"))};
+        pathTextField.setText(currentPath[0].toString());
         getButton.setOnAction(action -> {
             try {
                 executeGet(pathTextField.getText());
