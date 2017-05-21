@@ -1,5 +1,8 @@
 package FTP.Client.UI;
 
+import FTP.Client.Client;
+import FTP.Client.ClientImpl;
+
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -8,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         try(Scanner scanner = new Scanner(System.in)) {
             try {
-                FTP.Client.Client client = new FTP.Client.ClientImpl();
+                Client client = new ClientImpl();
                 while (true) {
                     try {
                         String[] clientArgs = scanner.nextLine().trim().split("\\s+");

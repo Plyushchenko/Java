@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -73,7 +74,6 @@ public class ClientImpl implements Client {
      * Connect to server
      * @throws IOException Unable to connect to server
      */
-    //TODO Что-то не то делает, когда не получается подключиться
     @Override
     public void connect() throws IOException {
         socketChannel = SocketChannel.open();
@@ -83,7 +83,7 @@ public class ClientImpl implements Client {
         try {
             socketChannel.connect(SERVER_ADDRESS);
             if (selector.select(1500) == 0 || !socketChannel.finishConnect()) {
-                throw new Exception();
+                throw new SocketTimeoutException("Unable to connect to server");
             }
         } catch (Exception e) {
             disconnect();

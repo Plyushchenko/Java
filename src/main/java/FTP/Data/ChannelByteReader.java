@@ -8,7 +8,7 @@ import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
-//TODO документация
+/** Helper class for reading from channels*/
 public class ChannelByteReader {
 
     private final static int BUFFER_SIZE = 4096;
@@ -22,6 +22,12 @@ public class ChannelByteReader {
         this.position = 0;
     }
 
+    /**
+     * Read a part of data from channel
+     * @param channel Channel to read from
+     * @return Number of bytes read (-1 for EOF)
+     * @throws IOException Reading problem
+     */
     public int read(@NotNull ByteChannel channel) throws IOException {
         int bytesRead = channel.read(buffer);
         if (bytesRead == -1) {
@@ -44,6 +50,12 @@ public class ChannelByteReader {
         return Arrays.copyOf(data, position);
     }
 
+    /**
+     * Read all the data from channel
+     * @param socketChannel Channel to read from
+     * @return Bytes read
+     * @throws IOException Reading problem
+     */
     @NotNull
     public byte[] readAll(@NotNull SocketChannel socketChannel) throws IOException {
         int bytesRead = read(socketChannel);

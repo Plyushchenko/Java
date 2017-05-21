@@ -46,20 +46,20 @@ public class ListCommand implements Command {
     @Override
     public String receiveResponse() throws IOException {
         byte[] responseAsByteArray = new ChannelByteReader().readAll(socketChannel);
-        String response = "size = ";
+        StringBuilder response = new StringBuilder("size = ");
         try (ByteArrayInputStream bs = new ByteArrayInputStream(responseAsByteArray);
                 DataInputStream is =  new DataInputStream(bs)) {
             int size = is.readInt();
-            response += String.valueOf(size);
-            response += "\nname is_dir\n";
+            response.append(String.valueOf(size));
+            response.append("\nname is_dir\n");
             while (size-- > 0) {
-                response += is.readUTF();
-                response += " ";
-                response += is.readBoolean();
-                response += "\n";
+                response.append(is.readUTF());
+                response.append(" ");
+                response.append(is.readBoolean());
+                response.append("\n");
             }
         }
-        return response;
+        return response.toString();
     }
 
 }
