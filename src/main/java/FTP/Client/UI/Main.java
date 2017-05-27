@@ -1,0 +1,33 @@
+package FTP.Client.UI;
+
+import FTP.Client.Client;
+import FTP.Client.ClientImpl;
+
+import java.io.IOException;
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        try(Scanner scanner = new Scanner(System.in)) {
+            try {
+                Client client = new ClientImpl();
+                while (true) {
+                    try {
+                        String[] clientArgs = scanner.nextLine().trim().split("\\s+");
+                        String response = client.execute(clientArgs);
+                        System.out.println("response = " + response);
+                        if (response.equals("BYE-BYE")) {
+                            break;
+                        }
+                    } catch (Exception e) {
+                        System.out.println("message = " + e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("message = " + e.getMessage());
+            }
+        }
+    }
+
+}
