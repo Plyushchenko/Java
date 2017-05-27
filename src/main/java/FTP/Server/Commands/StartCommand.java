@@ -76,7 +76,7 @@ public class StartCommand implements Command {
     private byte[] runClientCommand(@NotNull byte[] data) throws IOException,
             IncorrectArgsException {
         ClientParserOnServerSide parser = new ClientParserOnServerSide(data);
-        ClientCommand principleCommand = ClientCommand.valueOf(
+        ClientCommand.ClientCommands principleCommand = ClientCommand.ClientCommands.valueOf(
                 parser.getPrincipleCommandAsString().toUpperCase());
         switch (principleCommand) {
             case GET:

@@ -119,6 +119,9 @@ public class GUI extends Application {
             });
             return row;
         });
+        showAlert(Alert.AlertType.INFORMATION, "Usage",
+                "Get/List/.. buttons for path in the text field on the top\n"
+                        + "Double-click on table row for get/list command ");
         listButton.fire();
         HBox hbox = new HBox(getButton, listButton, goToParentButton);
         VBox vbox = new VBox(label, pathTextField, hbox, tableView);
@@ -175,7 +178,7 @@ public class GUI extends Application {
         alert.setHeaderText(header);
         alert.setContentText(s);
         alert.setResizable(true);
-        alert.getDialogPane().setPrefSize(400, 100);
+        alert.getDialogPane().setPrefSize(400, 180);
         alert.showAndWait();
     }
 

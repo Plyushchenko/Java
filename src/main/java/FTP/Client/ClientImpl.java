@@ -6,7 +6,6 @@ import FTP.Client.Commands.QuitCommand;
 import FTP.ClientCommand;
 import FTP.Exceptions.IncorrectArgsException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -48,7 +47,7 @@ public class ClientImpl implements Client {
     public String execute(@NotNull String[] args) throws IncorrectArgsException, IOException {
         Parser parser = new Parser(args);
         try {
-            ClientCommand principleCommand = ClientCommand.valueOf(
+            ClientCommand.ClientCommands principleCommand = ClientCommand.ClientCommands.valueOf(
                     parser.getPrincipleCommandAsString().toUpperCase());
             this.args = parser.getArgs();
             switch (principleCommand) {

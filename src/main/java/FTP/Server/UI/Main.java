@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        System.out.println("Usage: start/stop/quit");
         try(Scanner scanner = new Scanner(System.in)) {
             FTP.Server.Server server = new FTP.Server.ServerImpl();
             while (true) {

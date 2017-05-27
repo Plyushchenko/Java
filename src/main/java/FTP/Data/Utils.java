@@ -1,5 +1,6 @@
 package FTP.Data;
 
+import FTP.ClientCommand;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -14,7 +15,7 @@ public class Utils {
     private static byte[] buildByteArrayFromArgs(@NotNull String[] args) throws IOException {
         try (ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 DataOutputStream os = new DataOutputStream(bs)) {
-            os.writeInt(Integer.parseInt(args[0]));
+            os.writeInt(ClientCommand.CLIENT_COMMAND_CODES.get(args[0]));
             os.writeUTF(args[1]);
             os.flush();
             return bs.toByteArray();

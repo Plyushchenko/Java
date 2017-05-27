@@ -13,10 +13,8 @@ class Parser {
     String getPrincipleCommandAsString() {
         switch (args[0]) {
             case "get":
-                args[0] = "2";
                 return "get";
             case "list":
-                args[0] = "1";
                 return "list";
             case "quit":
                 return "quit";
