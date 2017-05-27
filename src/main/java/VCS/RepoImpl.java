@@ -131,30 +131,21 @@ public class RepoImpl implements Repo {
         }
         String branchName;
         if (args.size() == 1) {
+            logger.trace("begin branchCreate");
             branchName = args.get(0);
-            BranchCreateCommand branchCreateCommand = new BranchCreateCommand(fileSystem,
-                    branchName);
+            BranchCreateCommand branchCreateCommand =
+                    new BranchCreateCommand(fileSystem, logger, branchName);
             branchCreateCommand.run();
+            logger.trace("end branchCreate");
             return "branch " + branchName + " created";
         } else {
-            String branchName;
-            if (args.size() == 1) {
-                logger.trace("begin branchCreate");
-                branchName = args.get(0);
-                BranchCreateCommand branchCreateCommand =
-                        new BranchCreateCommand(fileSystem, logger, branchName);
-                branchCreateCommand.run();
-                logger.trace("end branchCreate");
-                return "branch " + branchName + " created";
-            } else {
-                logger.trace("begin branchDelete");
-                branchName = args.get(1);
-                BranchDeleteCommand branchDeleteCommand =
-                        new BranchDeleteCommand(fileSystem, logger, branchName);
-                branchDeleteCommand.run();
-                logger.trace("end branchDelete");
-                return "branch " + branchName + " deleted";
-            }
+            logger.trace("begin branchDelete");
+            branchName = args.get(1);
+            BranchDeleteCommand branchDeleteCommand =
+                    new BranchDeleteCommand(fileSystem, logger, branchName);
+            branchDeleteCommand.run();
+            logger.trace("end branchDelete");
+            return "branch " + branchName + " deleted";
         }
     }
 
@@ -312,4 +303,5 @@ public class RepoImpl implements Repo {
     public FileSystem getFileSystem() {
         return fileSystem;
     }
+
 }
