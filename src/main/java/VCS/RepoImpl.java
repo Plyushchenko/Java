@@ -128,6 +128,14 @@ public class RepoImpl implements Repo {
             branchListCommand.run();
             logger.trace("end branchList");
             return branchListCommand.getBranchList();
+        }
+        String branchName;
+        if (args.size() == 1) {
+            branchName = args.get(0);
+            BranchCreateCommand branchCreateCommand = new BranchCreateCommand(fileSystem,
+                    branchName);
+            branchCreateCommand.run();
+            return "branch " + branchName + " created";
         } else {
             String branchName;
             if (args.size() == 1) {
