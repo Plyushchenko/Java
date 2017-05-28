@@ -15,30 +15,18 @@ import static XUnit.Annotations.Test.NO_IGNORE;
 public class Tester {
 
     @NotNull private final List<Class> classesToTest;
-    @NotNull private final List<Method> beforeClassAnnotatedMethods;
-    @NotNull private final List<Method> beforeAnnotatedMethods;
-    @NotNull private final List<Method> afterAnnotatedMethods;
-    @NotNull private final List<Method> afterClassAnnotatedMethods;
-    @NotNull private final List<TestToRunInformation> testsToRunInformation;
-    @NotNull private final List<TestReport> testReports;
+    @NotNull private final List<Method> beforeClassAnnotatedMethods = new ArrayList<>();
+    @NotNull private final List<Method> beforeAnnotatedMethods = new ArrayList<>();
+    @NotNull private final List<Method> afterAnnotatedMethods = new ArrayList<>();
+    @NotNull private final List<Method> afterClassAnnotatedMethods = new ArrayList<>();
+    @NotNull private final List<TestToRunInformation> testsToRunInformation = new ArrayList<>();
+    @NotNull private final List<TestReport> testReports = new ArrayList<>();
 
     public Tester(@NotNull String[] args) throws IOException, ClassNotFoundException {
-        beforeClassAnnotatedMethods = new ArrayList<>();
-        beforeAnnotatedMethods = new ArrayList<>();
-        afterAnnotatedMethods = new ArrayList<>();
-        afterClassAnnotatedMethods = new ArrayList<>();
-        testsToRunInformation = new ArrayList<>();
-        testReports = new ArrayList<>();
         classesToTest = new Parser(args).buildListOfClassesToTest();
     }
 
     public Tester() {
-        beforeClassAnnotatedMethods = new ArrayList<>();
-        beforeAnnotatedMethods = new ArrayList<>();
-        afterAnnotatedMethods = new ArrayList<>();
-        afterClassAnnotatedMethods = new ArrayList<>();
-        testsToRunInformation = new ArrayList<>();
-        testReports = new ArrayList<>();
         classesToTest = new ArrayList<>();
     }
 
@@ -95,7 +83,6 @@ public class Tester {
             test(classToTest);
         }
     }
-
 
     @NotNull public List<TestReport> getTestReports() {
         return testReports;

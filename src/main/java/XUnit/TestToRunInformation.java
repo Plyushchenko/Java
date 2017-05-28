@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 
+/* Helper class for test to run information*/
 class TestToRunInformation {
 
     @NotNull private final Method method;
@@ -21,4 +22,5 @@ class TestToRunInformation {
     @NotNull Class getExpected() {
         return expected;
     }
+
 }

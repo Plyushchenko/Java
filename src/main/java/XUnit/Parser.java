@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/** Command line args parser*/
 class Parser {
 
-    private static final String CLASS_EXTENSION = ".class";
+    @NotNull private static final String CLASS_EXTENSION = ".class";
     private static final int CLASS_EXTENSION_LENGTH = CLASS_EXTENSION.length();
-    private final String[] args;
+    @NotNull private final String[] args;
 
     Parser(@NotNull String[] args) {
         this.args = args;
@@ -46,13 +47,16 @@ class Parser {
         return classesToTest;
     }
 
-    private String buildClassNameFromJarEntryName(String jarEntryName) {
+    @NotNull
+    private String buildClassNameFromJarEntryName(@NotNull String jarEntryName) {
         return jarEntryName
                 .substring(0, jarEntryName.length() - CLASS_EXTENSION_LENGTH)
                 .replace('/', '.');
     }
 
-    private URL buildUrlFromPathAsString(String pathAsString) throws MalformedURLException {
+    @NotNull
+    private URL buildUrlFromPathAsString(@NotNull String pathAsString)
+            throws MalformedURLException {
         return new URL("jar:file:" + pathAsString + "!/");
     }
 

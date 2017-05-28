@@ -5,12 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static XUnit.Annotations.Test.NO_IGNORE;
 
+/** Helper class to store information about test execution */
 public class TestReport {
 
     @NotNull private final String methodName;
@@ -18,8 +16,8 @@ public class TestReport {
     @NotNull private String reasonToIgnore = NO_IGNORE;
     @NotNull private Class expected = Test.NO_THROWABLE.class;
     @Nullable private Throwable throwable = null;
-    private String status;
-    private final String stringValue;
+    @NotNull private String status = "NOT YET";
+    @NotNull private final String stringValue;
 
     TestReport(@NotNull Method method, @NotNull String reasonToIgnore) {
         this.methodName = buildMethodName(method);
@@ -36,6 +34,7 @@ public class TestReport {
         stringValue = buildStringValue();
     }
 
+    @NotNull
     private String buildStringValue() {
         if (!reasonToIgnore.equals(NO_IGNORE)) {
             status = "IGNORED";

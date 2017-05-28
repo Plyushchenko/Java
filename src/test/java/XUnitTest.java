@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 public class XUnitTest {
 
-
     @Test
     public void checkTestClassesTest() throws IOException, ClassNotFoundException,
             NoSuchMethodException,
