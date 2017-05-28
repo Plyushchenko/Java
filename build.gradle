@@ -1,0 +1,27 @@
+group 'xunit'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+task XUnitJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'XUnit',
+                'Implementation-Version': version,
+                'Main-Class': 'Main'
+    }
+    baseName = 'xunit'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+dependencies {
+    compile group: 'org.jetbrains', name: 'annotations', version: '13.0'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.apache.commons:commons-lang3:3.5'
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    testCompile group: 'org.powermock', name: 'powermock-mockito-release-full', version: '1.5.6'
+}
