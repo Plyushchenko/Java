@@ -8,16 +8,13 @@ import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /** Branch list command*/
 public class BranchListCommand extends Command {
 
-    @NotNull private String branchListAsString = "";
+    @NotNull private StringBuilder branchListAsString = new StringBuilder();
 
     public BranchListCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
         super(fileSystem, logger);
@@ -44,11 +41,11 @@ public class BranchListCommand extends Command {
         Collections.sort(refs);
         for (String ref : refs) {
             if (ref.equals(currentBranchName)) {
-                branchListAsString += " *";
+                branchListAsString.append(" *");
             } else {
-                branchListAsString += "  ";
+                branchListAsString.append("  ");
             }
-            branchListAsString += ref + "\n";
+            branchListAsString.append(ref).append("\n");
         }
         logger.info("end: BranchListCommand.run()");
     }
@@ -58,6 +55,6 @@ public class BranchListCommand extends Command {
 
     @NotNull
     public String getBranchList() {
-        return branchListAsString;
+        return branchListAsString.toString();
     }
 }

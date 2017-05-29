@@ -15,7 +15,8 @@ import java.nio.file.Paths;
 /** Rm command*/
 public class RmCommand extends Command {
 
-    private final Path pathToFile;
+    @NotNull private final Path pathToFile;
+
     public RmCommand(@NotNull FileSystem fileSystem , @NotNull Logger logger,
                      @NotNull String fileToRm) {
         super(fileSystem, logger);

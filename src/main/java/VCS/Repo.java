@@ -65,6 +65,14 @@ public interface Repo {
     String checkout(@NotNull List<String> args) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
+    /**
+     * Execute 'mygit clean'
+     * @return Response about cleaning
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     String clean() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException;
@@ -113,14 +121,40 @@ public interface Repo {
     String merge(@NotNull String branchName) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
+    /**
+     * Execute 'mygit reset ...'
+     * @param fileToReset Path to file to reset
+     * @return Response about resetting
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     String reset(@NotNull String fileToReset) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
+    /**
+     * Execute 'mygit rm ...'
+     * @param fileToRm Path to file to rm
+     * @return Response about file removing
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     String rm(@NotNull String fileToRm) throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException;
 
+    /**
+     * Execute 'mygit status'
+     * @return Information about files
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     String status() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException;

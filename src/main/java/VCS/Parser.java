@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/** Command line args parser*/
 class Parser {
 
     @NotNull private final String[] args;
+
     Parser(@NotNull String[] args) {
         this.args = args;
     }

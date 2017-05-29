@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /** File state checker */
@@ -62,17 +61,17 @@ public class CheckFilesStateCommand extends Command {
     private void checkForUnstagedFiles(
             @NotNull List<String> filesToCommit, @NotNull List<String> hashesOfFilesToCommit) throws
             IOException, UnstagedChangesException {
-        String unstagedFiles = "";
+        StringBuilder unstagedFiles = new StringBuilder();
         for (int i = 0; i < filesToCommit.size(); i++) {
             if (fileSystem.notExists(Paths.get(filesToCommit.get(i)))
                     || !Blob.buildBlob(fileSystem, Paths.get(filesToCommit.get(i))).getHash()
                     .equals(hashesOfFilesToCommit.get(i))) {
-                unstagedFiles += filesToCommit.get(i) + "\n";
+                unstagedFiles.append(filesToCommit.get(i)).append("\n");
             }
         }
-        if (!unstagedFiles.equals("")) {
-            unstagedFiles = "Add/remove these files:\n" + unstagedFiles;
-            throw new UnstagedChangesException(unstagedFiles);
+        if (!unstagedFiles.toString().equals("")) {
+            unstagedFiles.insert(0, "Add/remove these files:\n");
+            throw new UnstagedChangesException(unstagedFiles.toString());
         }
     }
 
@@ -85,16 +84,16 @@ public class CheckFilesStateCommand extends Command {
                 fileSystem.buildTreeLocation(new Head(fileSystem).getCurrentBranchName()));
         List<String> committedFiles = treeContent.getKey();
         List<String> committedHashes = treeContent.getValue();
-        String UncommittedFiles = "";
+        StringBuilder uncommittedFiles = new StringBuilder();
         for (int i = 0; i < indexedFiles.size(); i++) {
             int j = committedFiles.indexOf(indexedFiles.get(i));
             if (j == -1 || !committedHashes.get(j).equals(indexedHashes.get(i))) {
-                UncommittedFiles += indexedFiles.get(i) + "\n";
+                uncommittedFiles.append(indexedFiles.get(i)).append("\n");
             }
         }
-        if (!UncommittedFiles.equals("")) {
-            UncommittedFiles = "Commit these files:\n" + UncommittedFiles;
-            throw new UncommittedChangesException(UncommittedFiles);
+        if (!uncommittedFiles.toString().equals("")) {
+            uncommittedFiles.insert(0, "Commit these files:\n");
+            throw new UncommittedChangesException(uncommittedFiles.toString());
         }
     }
 

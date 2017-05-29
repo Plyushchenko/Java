@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** File utils for git (mostly wrappers of java.io/java.nio commands */
+/** File utils for git (mostly wrappers of java.io/java.nio commands) */
 public class FileSystemImpl extends FileSystem {
 
     public FileSystemImpl(@NotNull Path workingDirectory) {

@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/** Logger builder*/
 public class LoggerBuilder {
 
+    /** Setup logger configuration*/
     @NotNull
     public static Logger buildLogger(@NotNull FileSystem fileSystem) throws IOException {
         Path path = fileSystem.getLoggerLocation();

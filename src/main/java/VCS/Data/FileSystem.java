@@ -1,9 +1,7 @@
 package VCS.Data;
 
 import javafx.util.Pair;
-import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +64,12 @@ public abstract class FileSystem {
         return gitLocation;
     }
 
-    @NotNull public Path getFolderWithGitLocation() {
+    /**
+     * Get location of folder where '.mygit' folder is located
+     * @return Location of folder where '.mygit' folder is located
+     */
+    @NotNull
+    public Path getFolderWithGitLocation() {
         return gitLocation.getParent();
     }
 
@@ -170,14 +173,14 @@ public abstract class FileSystem {
     @NotNull
     public String getFileContentAsString(@NotNull Path path) throws IOException {
         List<String> lines = getFileContentLineByLine(path);
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for (int i = 0; i < lines.size(); i++) {
-            res += lines.get(i);
+            res.append(lines.get(i));
             if (i + 1 != lines.size()) {
-                res += "\n";
+                res.append("\n");
             }
         }
-        return res;
+        return res.toString();
     }
 
     public abstract void deleteFile(@NotNull Path path) throws IOException;

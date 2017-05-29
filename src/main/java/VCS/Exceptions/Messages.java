@@ -1,5 +1,6 @@
 package VCS.Exceptions;
 
+/** Exception messages*/
 public class Messages {
 
     public static final String GIT_ALREADY_EXISTS = "Git already exists";

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-/** Tree */
+/** Git tree */
 public class Tree extends GitObject {
 
     private Tree(@NotNull FileSystem fileSystem, @NotNull byte[] content) {
@@ -28,10 +28,11 @@ public class Tree extends GitObject {
     @NotNull
     private static byte[] buildContent(@NotNull List<String> filesToCommit,
                                        @NotNull List<String> hashesOfFilesToCommit) {
-        String buffer = "";
+        StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < filesToCommit.size(); i++) {
-            buffer += filesToCommit.get(i) + "\n" + hashesOfFilesToCommit.get(i) + "\n";
+            buffer.append(filesToCommit.get(i)).append("\n").append(hashesOfFilesToCommit.get(i))
+                    .append("\n");
         }
-        return buffer.getBytes();
+        return buffer.toString().getBytes();
     }
 }

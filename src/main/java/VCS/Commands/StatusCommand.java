@@ -16,18 +16,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/** Status command*/
 public class StatusCommand extends Command {
 
-    @NotNull private List<Path> untracked;
-    @NotNull private List<Path> staged;
-    @NotNull private List<Path> modified;
-    @NotNull private List<Path> deleted;
+    @NotNull private final List<Path> untracked = new ArrayList<>();
+    @NotNull private final List<Path> staged = new ArrayList<>();
+    @NotNull private final List<Path> modified = new ArrayList<>();
+    @NotNull private final List<Path> deleted = new ArrayList<>();
+
     public StatusCommand(@NotNull FileSystem fileSystem, @NotNull Logger logger) {
         super(fileSystem, logger);
-        untracked = new ArrayList<>();
-        staged = new ArrayList<>();
-        modified = new ArrayList<>();
-        deleted = new ArrayList<>();
     }
 
     @Override
@@ -77,20 +75,20 @@ public class StatusCommand extends Command {
 
     @NotNull
     public String getStatus() {
-        String status = "";
+        StringBuilder status = new StringBuilder();
         for (Path path : modified) {
-            status += "modified: " + path + "\n";
+            status.append("modified: ").append(path).append("\n");
         }
         for (Path path : staged) {
-            status += "staged: " + path + "\n";
+            status.append("staged: ").append(path).append("\n");
         }
         for (Path path : deleted) {
-            status += "deleted: " + path + "\n";
+            status.append("deleted: ").append(path).append("\n");
         }
         for (Path path : untracked) {
-            status += "untracked: " + path + "\n";
+            status.append("untracked: ").append(path).append("\n");
         }
-        return status;
+        return status.toString();
     }
 
 
@@ -99,25 +97,19 @@ public class StatusCommand extends Command {
         return untracked;
     }
 
-    /*
     @NotNull
     public List<Path> getStaged() {
         return staged;
     }
-    */
 
-    /*
     @NotNull
     public List<Path> getModified() {
         return modified;
     }
-    */
 
-    /*
     @NotNull
     public List<Path> getDeleted() {
         return deleted;
     }
-    */
 
 }

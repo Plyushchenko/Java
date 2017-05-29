@@ -190,6 +190,15 @@ public class RepoImpl implements Repo {
         }
     }
 
+    /**
+     * Execute 'mygit clean'.
+     * Remove all untracked files in the current folder
+     * @return Response about cleaning
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     @Override
     public String clean() throws IncorrectArgsException, IOException, UnstagedChangesException,
@@ -199,6 +208,7 @@ public class RepoImpl implements Repo {
         logger.trace("end clean()");
         return "cleaned";
     }
+
     /**
      * Execute 'mygit commit ...'
      * @param message -m, commit message
@@ -268,6 +278,16 @@ public class RepoImpl implements Repo {
         return "'" + branchName + "' branch merged into current branch";
     }
 
+    /**
+     * Execute 'mygit reset ...'
+     * Set file status to 'untracked'
+     * @param fileToReset Path to file to reset
+     * @return Response about resetting
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     @Override
     public String reset(@NotNull String fileToReset) throws IncorrectArgsException, IOException,
@@ -278,6 +298,16 @@ public class RepoImpl implements Repo {
         return "reset file: " + fileToReset;
     }
 
+    /**
+     * Execute 'mygit rm ...'.
+     * Reset + remove
+     * @param fileToRm Path to file to rm
+     * @return Response about file removing
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     @Override
     public String rm(@NotNull String fileToRm) throws IncorrectArgsException, IOException,
@@ -288,9 +318,17 @@ public class RepoImpl implements Repo {
         return "rm file: " + fileToRm;
     }
 
+    /**
+     * Execute 'mygit status'
+     * @return Information about files
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @NotNull
     @Override
-    public String status()throws IncorrectArgsException, IOException,
+    public String status() throws IncorrectArgsException, IOException,
             UnstagedChangesException, UncommittedChangesException {
         logger.trace("begin status()");
         StatusCommand statusCommand = new StatusCommand(fileSystem, logger);
