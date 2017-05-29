@@ -19,6 +19,7 @@ import org.apache.logging.log4j.core.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -37,6 +38,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.*;
 
+@PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({BranchListCommand.class, LogCommand.class, CheckoutByBranchCommand.class,
         BranchDeleteCommand.class, LoggerBuilder.class, RepoImpl.class})
@@ -326,7 +328,7 @@ public class VCSTests {
         new RepoImpl(new String[]{"commit", "-m", "commit at master"}, globalRoot).execute();
         fileSystem.deleteFile(paths.get(1));
         status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
+        assertFalse(status.contains(paths.get(0).toString()));
         assertTrue(status.contains("deleted: " + paths.get(1).toString() + "\n"));
         assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
         assertTrue(status.contains("untracked: " + paths.get(3).toString() + "\n"));
@@ -341,10 +343,10 @@ public class VCSTests {
         new RepoImpl(new String[]{"reset", paths.get(1).toString()}, globalRoot).execute();
         new RepoImpl(new String[]{"commit", "-m", "another one"}, globalRoot).execute();
         status = new RepoImpl(STATUS_ARGS, globalRoot).execute();
-        assertTrue(status.contains("staged: " + paths.get(0).toString() + "\n"));
+        assertFalse(status.contains(paths.get(0).toString()));
         assertFalse(status.contains(paths.get(1).toString()));
         assertTrue(status.contains("untracked: " + paths.get(2).toString() + "\n"));
-        assertTrue(status.contains("staged: " + paths.get(3).toString() + "\n"));
+        assertFalse(status.contains(paths.get(3).toString()));
     }
 
     @Test

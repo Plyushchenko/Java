@@ -5,6 +5,7 @@ import VCS.Exceptions.IncorrectArgsException;
 import VCS.Exceptions.UncommittedChangesException;
 import VCS.Exceptions.UnstagedChangesException;
 import VCS.Objects.GitObjects.Blob;
+import VCS.Objects.Head;
 import javafx.util.Pair;
 import org.apache.logging.log4j.core.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,14 @@ public class StatusCommand extends Command {
         super(fileSystem, logger);
     }
 
+    /**
+     * Run 'status' command.
+     * Default folder is the folder where '.mygit' directory is located
+     * @throws IncorrectArgsException Incorrect args passed
+     * @throws IOException Unknown IO problem
+     * @throws UnstagedChangesException Changes were not staged
+     * @throws UncommittedChangesException Changes were not committed
+     */
     @Override
     public void run() throws IncorrectArgsException, IOException, UnstagedChangesException,
             UncommittedChangesException {
@@ -36,6 +45,11 @@ public class StatusCommand extends Command {
         logger.info("end: StatusCommand.run()");
     }
 
+    /**
+     * Run 'status' command on specified folder.
+     * @param folderPath Specified folder
+     * @throws IOException Unknown IO problem
+     */
     void runWithFolder(@NotNull Path folderPath) throws IOException {
         logger.info("begin: StatusCommand.run(" + folderPath + ")");
         List<Path> paths = fileSystem.getFolderContent(folderPath);
@@ -44,6 +58,10 @@ public class StatusCommand extends Command {
                 fileSystem.getIndexLocation());
         List<String> indexedFiles = indexContent.getKey();
         List<String> indexedHashes = indexContent.getValue();
+        Pair<List<String>, List<String>> headCommitContent = fileSystem.splitLines(fileSystem
+                .buildTreeLocation(new Head(fileSystem).getCurrentBranchName()));
+        List<String> headCommitFiles = headCommitContent.getKey();
+        List<String> headCommitHashes = headCommitContent.getValue();
         List<Boolean> found = new ArrayList<>(Collections.nCopies(
                 indexedFiles.size(), Boolean.FALSE));
         for (Path path : paths) {
@@ -56,6 +74,10 @@ public class StatusCommand extends Command {
             } else {
                 found.set(i, Boolean.TRUE);
                 if (indexedHashes.get(i).equals(Blob.buildBlob(fileSystem, path).getHash())) {
+                    int j = headCommitFiles.indexOf(path.toString());
+                    if (j != -1 && indexedHashes.get(i).equals(headCommitHashes.get(j))) {
+                       continue;
+                    }
                     staged.add(path);
                 } else {
                     modified.add(path);
