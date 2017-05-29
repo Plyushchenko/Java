@@ -1,0 +1,41 @@
+git init
+Создаёт .git/ и некоторые подпапки
+
+git add file1 file2...
+Добавляет файлы и хеши  (или просто обновляет хеш) их содержимых в .git/index
+
+git commit message
+Коммитит в текущую ветку все файлы из .git/index и их хеши
+
+git branch
+Печатает список веток, в т.ч. текущую с отметкой.
+
+git branch branchName
+Создаёт новую ветку
+
+git branch -d branchName
+Удаляет ветку
+
+git checkout -b branch
+Создаёт новую ветку и переключается на неё
+
+git checkout branch
+Переключается на ветку
+
+git checkout hash
+Переключается на коммит с хешом hash.
+
+git merge branchName
+Вливает ветку branchName в текущую ветку. Если состояние одного и того же файла разное в двух ветках, то файл будет в состоянии как в branchName.
+Также весь .git/index будет закоммичен.
+
+git status
+Выведет список файлов с их статусом (untracked/modified/deleted/staged).
+
+git reset file
+Установит статус файла как unstaged.
+
+git rm file
+reset + удаление файла.
+git clean
+Удалятся все untracked файлы из данной папки.
