@@ -3,7 +3,8 @@ pipeline {
 	stages {
 		stage('build') {
 			steps {
-				bat 'mvn --version'
+				sh 'cd 002/TrieHW'
+				sh 'gradle build'
 			}
 		}
 	}
